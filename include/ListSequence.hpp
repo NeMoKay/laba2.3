@@ -1,6 +1,7 @@
 #pragma once
 
 #include "sequence.hpp"
+#include "ArraySequence.hpp"
 #include "LinkedList.hpp"
 #include "iostream"
 #include <cstddef>

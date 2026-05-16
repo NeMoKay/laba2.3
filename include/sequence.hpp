@@ -33,14 +33,6 @@ public:
     virtual Sequence<T>* InsertAt(T item, size_t index) = 0;
     virtual Sequence <T>* Concat(Sequence <T> *list) = 0;
 
-    template<typename T2>
-    Sequence<T2>* Map(T2 (*funk)(T));
-    template<typename T2>
-    T2 Reduce(T2 (*func)(T2, T), T2 start_val);
-    Sequence<T>* Where(bool (*check_funk)(T));
-
-
-
     SequenceStats<T> get_stats() const requires is_arithmetic_v<T>; 
     virtual Sequence<T> *ReflectSum() const;
     size_t GetInversions() const;

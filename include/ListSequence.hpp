@@ -1,8 +1,8 @@
 #pragma once
 
 #include "sequence.hpp"
-#include "ArraySequence.hpp"
 #include "LinkedList.hpp"
+#include "ArraySequence.hpp"
 #include "iostream"
 #include <cstddef>
 #include <string>
@@ -45,14 +45,6 @@ public:
     ListSequence<T>* Prepend(T item) override;
     ListSequence<T>* InsertAt(T item, size_t index) override;
     Sequence<T>* Concat(Sequence<T>* list_p) override;
-
-    template<typename T2>
-    Sequence<T2>* Map(T2 (*funk)(T));
-
-    template<typename T2>
-    T2 Reduce(T2 (*funk)(T2, T), T2 start_val);
-
-    Sequence<T>* Where(bool (*check_funk)(T));
 
     ~ListSequence();
 };
@@ -205,49 +197,6 @@ Sequence<T>* ListSequence<T>::Concat(Sequence<T>* list_p){
 }
 
 template <typename T >
-template <typename T2>
-Sequence<T2>* ListSequence<T>::Map(T2 (*funk)(T)){
-
-    Sequence<T2>* result = new ListSequence<T2>;
-
-    for(size_t i = 0; i < this->GetLength(); i++){
-        result->Append(funk(this->Get(i)));
-    }
-
-    return result;
-}
-
-template <typename T >
-template <typename T2>
-T2 ListSequence<T>::Reduce(T2 (*funk)(T2, T), T2 start_val){
-
-    T2 result = start_val;
-
-    for(size_t i = 0; i < this->GetLength(); i++){
-        result = funk(result, this->Get(i));
-    }
-
-    return result;
-}
-
-template <typename T >
-Sequence<T>* ListSequence<T>::Where(bool (*check_funk)(T)){
-
-    Sequence<T>* result = new ListSequence<T>;
-
-    for(size_t i = 0; i < this->GetLength(); i++){
-
-        T item = this->Get(i);
-
-        if(check_funk(item)){
-            result->Append(item);
-        }
-    }
-
-    return result;
-}
-
-template <typename T >
 ListSequence<T>::~ListSequence(){
     delete items;
 }
@@ -305,4 +254,35 @@ Sequence<T>* ListSequence<T>::ReflectSum() const{
     else{
         throw InvalidSizeException("доступна только для числовых типов");
     }
+}
+
+
+template <typename T, typename T2>
+ListSequence<T2>* Map(ListSequence<T>* seq, T2 (*func)(T)){
+    ListSequence<T2>* result = new ListSequence<T2>();
+    for(size_t i = 0; i < seq->GetLength(); i++){
+        result->Append(func(seq->Get(i)));
+    }
+    return result;
+}
+
+template <typename T, typename T2>
+T2 Reduce(ListSequence<T>* seq, T2 (*func)(T2, T), T2 start_val){
+    T2 result = start_val;
+    for(size_t i = 0; i < seq->GetLength(); i++){
+        result = func(result, seq->Get(i));
+    }
+    return result;
+}
+
+template <typename T>
+ListSequence<T>* Where(ListSequence<T>* seq, bool (*check_func)(T)){
+    ListSequence<T>* result = new ListSequence<T>();
+    for(size_t i = 0; i < seq->GetLength(); i++){
+        T item = seq->Get(i);
+        if(check_func(item)){
+            result->Append(item);
+        }
+    }
+    return result;
 }

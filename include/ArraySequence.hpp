@@ -10,8 +10,6 @@
 #include "exceptions.hpp"
 
 
-
-
 template <typename T>
 class ArraySequence : public Sequence<T>{
 private:
@@ -41,15 +39,8 @@ public:
     ArraySequence<T>* Prepend(T item) override;
     ArraySequence<T>* InsertAt(T item, size_t index) override;
     ArraySequence<T>* Concat(Sequence<T>* list) override;
-
     Sequence<T> *ReflectSum() const override;
     
-    template<typename T2>
-    Sequence<T2>* Map(T2 (*funk)(T));
-    template<typename T2>
-    T2 Reduce(T2 (*func)(T2, T), T2 start_val);
-    Sequence<T>* Where(bool (*check_funk)(T));
-
     ~ArraySequence();
 };
 
@@ -214,40 +205,6 @@ ArraySequence<T>* ArraySequence<T>::Concat(Sequence<T>* list){
     return type_Arr;
 }
 
-template <typename T >
-template<typename T2>
-Sequence<T2>* ArraySequence<T>::Map(T2 (*funk)(T)){
-    Sequence<T2>* result = new ArraySequence<T2>;
-
-    for(size_t i = 0; i < this->GetLength();i++){
-        result->Append(funk(this->Get(i)));
-    }
-    return result;
-}
-
-template <typename T >
-template<typename T2>
-T2 ArraySequence<T>::Reduce(T2 (*func)(T2, T), T2 start_val){
-    T2 result = start_val;
-    
-    for(size_t i = 0; i < this->GetLength(); i++){
-        result = func(result, this->Get(i));
-    }
-    return result;
-}
-
-template <typename T >
-Sequence<T>* ArraySequence<T>::Where(bool (*check_funk)(T)){
-    Sequence<T>* result = new ArraySequence<T>;
-
-    for(size_t i = 0; i < this->GetLength(); i++){
-        T item = this->Get(i);
-        if(check_funk(item)){
-            result->Append(item);
-        }
-    }
-    return result;
-}
 
 template <typename T>
 ArraySequence<T>::~ArraySequence(){
@@ -303,4 +260,35 @@ Sequence<T>* ArraySequence<T>::ReflectSum() const{
     else{
         throw InvalidSizeException("доступна только для числовых типов");
     }
+}
+
+
+template <typename T, typename T2>
+ArraySequence<T2>* Map(ArraySequence<T>* seq, T2 (*func)(T)){
+    ArraySequence<T2>* result = new ArraySequence<T2>();
+    for(size_t i = 0; i < seq->GetLength(); i++){
+        result->Append(func(seq->Get(i)));
+    }
+    return result;
+}
+
+template <typename T, typename T2>
+T2 Reduce(ArraySequence<T>* seq, T2 (*func)(T2, T), T2 start_val){
+    T2 result = start_val;
+    for(size_t i = 0; i < seq->GetLength(); i++){
+        result = func(result, seq->Get(i));
+    }
+    return result;
+}
+
+template <typename T>
+ArraySequence<T>* Where(ArraySequence<T>* seq, bool (*check_func)(T)){
+    ArraySequence<T>* result = new ArraySequence<T>();
+    for(size_t i = 0; i < seq->GetLength(); i++){
+        T item = seq->Get(i);
+        if(check_func(item)){
+            result->Append(item);
+        }
+    }
+    return result;
 }

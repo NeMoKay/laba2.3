@@ -1,1 +1,50 @@
 #include <gtest/gtest.h>
+
+#include "SparseMatrix.hpp"
+
+
+class Sparse_Matrix_Fixture : public testing::Test{
+protected:
+    SparseMatrix<ArraySequence, int>* empty_mat;
+    SparseMatrix<ArraySequence, int>* zero_mat;
+    
+    SparseMatrix<ArraySequence, int>* mat_A;
+    SparseMatrix<ArraySequence, int>* mat_B;
+    SparseMatrix<ArraySequence, int>* mat_C;
+
+    void SetUp() override{
+        empty_mat = new SparseMatrix<ArraySequence, int>();
+        zero_mat = new SparseMatrix<ArraySequence, int>(3, 3);
+
+
+        ArraySequence<Matrix_elem<int>> seq_A;
+        seq_A.Append(Matrix_elem<int>(1, 0, 0));
+        seq_A.Append(Matrix_elem<int>(2, 0, 2));
+        seq_A.Append(Matrix_elem<int>(3, 1, 1));
+        seq_A.Append(Matrix_elem<int>(4, 2, 0));
+        seq_A.Append(Matrix_elem<int>(5, 2, 2));
+        mat_A = new SparseMatrix<ArraySequence, int>(seq_A, 3, 3);
+
+        ArraySequence<Matrix_elem<int>> seq_B;
+        seq_B.Append(Matrix_elem<int>(2, 0, 2));
+        seq_B.Append(Matrix_elem<int>(1, 1, 0));
+        seq_B.Append(Matrix_elem<int>(2, 1, 1));
+        seq_B.Append(Matrix_elem<int>(-5, 2, 2));
+        mat_B = new SparseMatrix<ArraySequence, int>(seq_B, 3, 3);
+
+        ArraySequence<Matrix_elem<int>> seq_C;
+        seq_C.Append(Matrix_elem<int>(1, 0, 0));
+        seq_C.Append(Matrix_elem<int>(2, 0, 1));
+        seq_C.Append(Matrix_elem<int>(3, 1, 1));
+        seq_C.Append(Matrix_elem<int>(4, 2, 0));
+        mat_C = new SparseMatrix<ArraySequence, int>(seq_C, 3, 2);
+    }
+
+    void TearDown() override {
+        delete empty_mat;
+        delete zero_mat;
+        delete mat_A;
+        delete mat_B;
+        delete mat_C;
+    }
+};

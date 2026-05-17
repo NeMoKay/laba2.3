@@ -16,9 +16,17 @@ struct Complex {
     bool operator!=(const Complex& other) const{
         return (re != other.re) || (im != other.im);
     }
+    Complex& operator+=(const Complex& other) {
+        re += other.re;
+        im += other.im;
+        return *this;
+    }
+    bool operator==(const Complex& other) const {
+        return (re == other.re) && (im == other.im);
+    }
 };
 
 
-Complex sqrt(const Complex& c){
+inline Complex sqrt(const Complex& c) {
     return Complex(std::sqrt(c.re * c.re + c.im * c.im), 0);
 }

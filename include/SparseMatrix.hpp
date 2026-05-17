@@ -42,6 +42,8 @@ public:
     SparseMatrix operator+(const SparseMatrix& other) const;
     SparseMatrix operator*(const SparseMatrix& other) const;
     T Get_Norm() const;
+
+    ~SparseMatrix();
 };
 
 
@@ -113,7 +115,6 @@ SparseMatrix<Container, T> SparseMatrix<Container, T>::operator+(const SparseMat
             res_data.Append(temp_set_elem);
         }
     }
-    ћ
     return SparseMatrix<Container, T>(res_data, rows, cols);
 }
 
@@ -150,5 +151,10 @@ T SparseMatrix<Container, T>::Get_Norm() const{
         T val = data.Get(k).elem;
         sum_sq += val * val;
     }
-    return std::sqrt(sum_sq);
+
+    using std::sqrt;
+    return sqrt(sum_sq); 
 }
+
+template <template <typename> class Container, typename T>
+SparseMatrix<Container, T>::~SparseMatrix() {}

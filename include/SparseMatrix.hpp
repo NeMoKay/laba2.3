@@ -36,8 +36,6 @@ public:
     size_t Get_cols() const;
     T Get_elem(size_t i, size_t j) const;
 
-    
-
     T operator()(size_t i, size_t j) const;
     SparseMatrix operator+(const SparseMatrix& other) const;
     SparseMatrix operator*(const SparseMatrix& other) const;
@@ -50,13 +48,13 @@ public:
 
 //public 
 template <template <typename> class Container, typename T>
-SparseMatrix<Container, T>::SparseMatrix() : rows(0), cols(0), data() {}
+SparseMatrix<Container, T>::SparseMatrix() : rows(0), cols(0), data(){}
 
 template <template <typename> class Container, typename T>
-SparseMatrix<Container, T>::SparseMatrix(const Container<Matrix_elem<T>>& new_data, size_t new_rows, size_t new_cols) : rows(new_rows), cols(new_cols), data(new_data) {}
+SparseMatrix<Container, T>::SparseMatrix(const Container<Matrix_elem<T>>& new_data, size_t new_rows, size_t new_cols) : rows(new_rows), cols(new_cols), data(new_data){}
 
 template <template <typename> class Container, typename T>
-SparseMatrix<Container, T>::SparseMatrix(size_t new_rows, size_t new_cols) : rows(new_rows), cols(new_cols), data() {}
+SparseMatrix<Container, T>::SparseMatrix(size_t new_rows, size_t new_cols) : rows(new_rows), cols(new_cols), data(){}
 
 
 template <template <typename> class Container, typename T>
@@ -71,10 +69,10 @@ size_t SparseMatrix<Container, T>::Get_cols() const{
 template <template <typename> class Container, typename T>
 T SparseMatrix<Container, T>::Get_elem(size_t i, size_t j) const{
     if(i >= rows || j >= cols){
-        throw IndexOutOfRangeException(std::format("i до {}, j до {}. Выход из диапазона", i, j));
+        throw IndexOutOfRangeException(std::format("i до{}, j до{}. Выход из диапазона", i, j));
     }
 
-    for (size_t k = 0; k < data.GetLength(); ++k) {
+    for (size_t k = 0; k < data.GetLength(); ++k){
         Matrix_elem<T> copy = data.Get(k);
         if (copy.i == i && copy.j == j){
             return copy.elem;
@@ -91,19 +89,19 @@ T SparseMatrix<Container, T>::operator()(size_t i, size_t j) const{
 }
 
 template <template <typename> class Container, typename T>
-SparseMatrix<Container, T> SparseMatrix<Container, T>::operator+(const SparseMatrix<Container, T>& other) const {
+SparseMatrix<Container, T> SparseMatrix<Container, T>::operator+(const SparseMatrix<Container, T>& other) const{
     if (rows != other.rows || cols != other.cols){
-        throw InvalidSizeException(std::format("Матрицы должны иметь одинаковый размер: левая {}x{}, правая {}x{}", rows, cols, other.rows, other.cols));
+        throw InvalidSizeException(std::format("Матрицы должны иметь одинаковый размер: левая{}x{}, правая{}x{}", rows, cols, other.rows, other.cols));
     }
 
-    Container<Matrix_elem<T>> res_data;
+    Container<Matrix_elem<T>> result;
 
     for (size_t k = 0; k < data.GetLength(); ++k){
         Matrix_elem<T> temp_get_sum = data.Get(k);
 
         T sum = temp_get_sum.elem + other.Get_elem(temp_get_sum.i, temp_get_sum.j);
         if (sum != T()){
-            res_data.Append(Matrix_elem<T>(sum, temp_get_sum.i, temp_get_sum.j));
+            result.Append(Matrix_elem<T>(sum, temp_get_sum.i, temp_get_sum.j));
         }
     }
 
@@ -112,19 +110,19 @@ SparseMatrix<Container, T> SparseMatrix<Container, T>::operator+(const SparseMat
         Matrix_elem<T> temp_set_elem = other.data.Get(k);
 
         if (Get_elem(temp_set_elem.i, temp_set_elem.j) == T()){
-            res_data.Append(temp_set_elem);
+            result.Append(temp_set_elem);
         }
     }
-    return SparseMatrix<Container, T>(res_data, rows, cols);
+    return SparseMatrix<Container, T>(result, rows, cols);
 }
 
 
 template <template <typename> class Container, typename T>
-SparseMatrix<Container, T> SparseMatrix<Container, T>::operator*(const SparseMatrix<Container, T>& other) const {
+SparseMatrix<Container, T> SparseMatrix<Container, T>::operator*(const SparseMatrix<Container, T>& other) const{
     if (cols != other.rows){
         throw InvalidSizeException(std::format("Умножение невозможно: столбцы левой ({}) != строки правой ({})", cols, other.rows));
     }
-    Container<Matrix_elem<T>> res_data;
+    Container<Matrix_elem<T>> result;
 
     for (size_t i = 0; i < rows; ++i){
         for (size_t j = 0; j < other.cols; ++j){
@@ -136,11 +134,11 @@ SparseMatrix<Container, T> SparseMatrix<Container, T>::operator*(const SparseMat
                 }
             }
             if (current_sum != T()){
-                res_data.Append(Matrix_elem<T>(current_sum, i, j));
+                result.Append(Matrix_elem<T>(current_sum, i, j));
             }
         }
     }
-    return SparseMatrix<Container, T>(res_data, rows, other.cols);
+    return SparseMatrix<Container, T>(result, rows, other.cols);
 }
 
 
@@ -157,4 +155,4 @@ T SparseMatrix<Container, T>::Get_Norm() const{
 }
 
 template <template <typename> class Container, typename T>
-SparseMatrix<Container, T>::~SparseMatrix() {}
+SparseMatrix<Container, T>:: ~SparseMatrix(){}

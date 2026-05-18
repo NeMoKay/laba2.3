@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
 #include "SparseMatrix.hpp"
-
+#include "Complex.hpp"
 
 class Sparse_Matrix_Fixture : public testing::Test{
 protected:
@@ -12,10 +12,12 @@ protected:
     SparseMatrix<ArraySequence, int>* mat_B;
     SparseMatrix<ArraySequence, int>* mat_C;
 
-    void SetUp() override{
-        empty_mat = new SparseMatrix<ArraySequence, int>();
-        zero_mat = new SparseMatrix<ArraySequence, int>(3, 3);
+    SparseMatrix<ArraySequence, Complex>* mat_complex_A;
+    SparseMatrix<ArraySequence, Complex>* mat_complex_B;
 
+    void SetUp() override{
+        empty_mat = new SparseMatrix<ArraySequence, int>;
+        zero_mat = new SparseMatrix<ArraySequence, int>(3, 3);
 
         ArraySequence<Matrix_elem<int>> seq_A;
         seq_A.Append(Matrix_elem<int>(1, 0, 0));
@@ -38,13 +40,25 @@ protected:
         seq_C.Append(Matrix_elem<int>(3, 1, 1));
         seq_C.Append(Matrix_elem<int>(4, 2, 0));
         mat_C = new SparseMatrix<ArraySequence, int>(seq_C, 3, 2);
+
+        ArraySequence<Matrix_elem<Complex>> seq_comp_A;
+        seq_comp_A.Append(Matrix_elem<Complex>(Complex(1.0, 2.0), 0, 0));
+        seq_comp_A.Append(Matrix_elem<Complex>(Complex(3.0, -1.0), 1, 1));
+        mat_complex_A = new SparseMatrix<ArraySequence, Complex>(seq_comp_A, 2, 2);
+
+        ArraySequence<Matrix_elem<Complex>> seq_comp_B;
+        seq_comp_B.Append(Matrix_elem<Complex>(Complex(2.0, 1.0), 0, 0));
+        seq_comp_B.Append(Matrix_elem<Complex>(Complex(1.0, 1.0), 1, 1));
+        mat_complex_B = new SparseMatrix<ArraySequence, Complex>(seq_comp_B, 2, 2);
     }
 
-    void TearDown() override {
+    void TearDown() override{
         delete empty_mat;
         delete zero_mat;
         delete mat_A;
         delete mat_B;
         delete mat_C;
+        delete mat_complex_A;
+        delete mat_complex_B;
     }
 };

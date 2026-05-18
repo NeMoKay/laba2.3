@@ -1,9 +1,9 @@
 #include <cmath>
 
-struct Complex {
+struct Complex{
     double re, im;
 
-    Complex(double r = 0, double i = 0) : re(r), im(i) {}
+    Complex(double r = 0, double i = 0) : re(r), im(i){}
 
     Complex operator+(const Complex& other) const{
         return Complex(re + other.re, im + other.im);
@@ -16,17 +16,17 @@ struct Complex {
     bool operator!=(const Complex& other) const{
         return (re != other.re) || (im != other.im);
     }
-    Complex& operator+=(const Complex& other) {
+    Complex& operator+=(const Complex& other){
         re += other.re;
         im += other.im;
         return *this;
     }
-    bool operator==(const Complex& other) const {
+    bool operator==(const Complex& other) const{
         return (re == other.re) && (im == other.im);
     }
 };
 
 
-inline Complex sqrt(const Complex& c) {
+inline Complex sqrt(const Complex& c){
     return Complex(std::sqrt(c.re * c.re + c.im * c.im), 0);
 }

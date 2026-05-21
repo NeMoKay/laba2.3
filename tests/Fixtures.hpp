@@ -67,7 +67,7 @@ protected:
 };
 
 
-class Dict_Test : public testing::Test{
+class Dict_Fixture : public testing::Test{
 protected:
     Dict<Pair<int, int>, double, ArraySequence>* dict;
 
@@ -79,3 +79,16 @@ protected:
         delete dict;
     }
 };
+
+
+template <typename T, template <typename> class Container>
+inline void show_matrix(const SparseMatrix<Container, T>& matrix){
+    Container<Matrix_elem<T>> items = matrix.Get_Elements(); 
+    std::cout << "Вывод элементов матрицы по индексу:" << std::endl;
+
+    for (size_t k = 0; k < items.GetLength(); ++k){
+        Matrix_elem<T> temp = items.Get(k); 
+        std::cout << "Элемент по индексам (" << temp.i << ", " << temp.j  << ") = " << temp.elem << std::endl;
+    }
+    
+}

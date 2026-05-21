@@ -29,21 +29,10 @@ private:
 
     size_t rows;
     size_t cols;
-    
     Dict<Pair<size_t, size_t>, T, Container> dict_data;
 
-    Container<Matrix_elem<T>> Get_Elements() const{
-        Container<Matrix_elem<T>> result;
-        auto items = dict_data.Get_Items();
-        
-        for (size_t k = 0; k < items.GetLength(); ++k){
-            auto now_elem = items.Get(k);
-            result.Append(Matrix_elem<T>(now_elem.elem2, now_elem.elem1.elem1, now_elem.elem1.elem2));
-        }
-        return result;
-    }
-
 public:
+
     SparseMatrix();
     SparseMatrix(const Container<Matrix_elem<T>>& new_data, size_t new_rows, size_t new_cols);
     SparseMatrix(size_t new_rows, size_t new_col);
@@ -51,7 +40,10 @@ public:
 
     size_t Get_rows() const;
     size_t Get_cols() const;
+    size_t Get_size() const;
     T Get_elem(size_t i, size_t j) const;
+    Container<Matrix_elem<T>> Get_Elements() const;
+
 
     T operator()(size_t i, size_t j) const;
     SparseMatrix operator+(const SparseMatrix& other) const;
@@ -89,6 +81,11 @@ size_t SparseMatrix<Container, T>::Get_cols() const{
 }
 
 template <template <typename> class Container, typename T>
+size_t SparseMatrix<Container, T>::Get_size() const{
+    return dict_data.Get_Items().GetLength();
+}
+
+template <template <typename> class Container, typename T>
 T SparseMatrix<Container, T>::Get_elem(size_t i, size_t j) const{
     if(i >= rows || j >= cols){
         throw IndexOutOfRangeException(std::format("i до {}, j до {}. Выход из диапазона", i, j));
@@ -96,12 +93,24 @@ T SparseMatrix<Container, T>::Get_elem(size_t i, size_t j) const{
 
     return dict_data.Get(Pair<size_t, size_t>(i, j));
 }
+template <template <typename> class Container, typename T>
+Container<Matrix_elem<T>> SparseMatrix<Container, T>::Get_Elements() const{
+        Container<Matrix_elem<T>> result;
+        auto items = dict_data.Get_Items();
+        
+        for (size_t k = 0; k < items.GetLength(); ++k){
+            auto now_elem = items.Get(k);
+            result.Append(Matrix_elem<T>(now_elem.elem2, now_elem.elem1.elem1, now_elem.elem1.elem2));
+        }
+        return result;
+    }
 
 template <template <typename> class Container, typename T>
 T SparseMatrix<Container, T>::operator()(size_t i, size_t j) const{
     return Get_elem(i, j);
 
 }
+
 
 template <template <typename> class Container, typename T>
 SparseMatrix<Container, T> SparseMatrix<Container, T>::operator+(const SparseMatrix<Container, T>& other) const{

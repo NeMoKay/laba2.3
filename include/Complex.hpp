@@ -24,9 +24,20 @@ struct Complex{
     bool operator==(const Complex& other) const{
         return (re == other.re) && (im == other.im);
     }
+
+    
 };
 
+inline std::ostream& operator<<(std::ostream& console, const Complex& item){
+    console << item.re;
+    if (item.im >= 0){
+        console << "+";
+    }
+    console << item.im << "i";
+    return console;
+}
 
-inline Complex sqrt(const Complex& c){
-    return Complex(std::sqrt(c.re * c.re + c.im * c.im), 0);
+
+inline Complex sqrt(const Complex& item){
+    return Complex(std::sqrt(item.re * item.re + item.im * item.im), 0);
 }

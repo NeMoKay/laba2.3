@@ -30,17 +30,15 @@ private:
     size_t rows;
     size_t cols;
     
-    // Заменяем Container на Dict, ключом будет Pair<i, j>, значением - T
     Dict<Pair<size_t, size_t>, T, Container> dict_data;
 
-    // Скрытый метод-переходник: выгружает элементы из словаря в старый удобный формат
     Container<Matrix_elem<T>> Get_Elements() const{
         Container<Matrix_elem<T>> result;
-        auto items = dict_data.Get_Items(); // Получаем Container<Pair<Pair<size_t, size_t>, T>>
+        auto items = dict_data.Get_Items();
         
         for (size_t k = 0; k < items.GetLength(); ++k){
-            auto current = items.Get(k);
-            result.Append(Matrix_elem<T>(current.elem2, current.elem1.elem1, current.elem1.elem2));
+            auto now_elem = items.Get(k);
+            result.Append(Matrix_elem<T>(now_elem.elem2, now_elem.elem1.elem1, now_elem.elem1.elem2));
         }
         return result;
     }
@@ -112,10 +110,10 @@ SparseMatrix<Container, T> SparseMatrix<Container, T>::operator+(const SparseMat
     }
 
     Container<Matrix_elem<T>> result;
-    auto flat_data = Get_Elements();
+    auto real_data = Get_Elements();
 
-    for (size_t k = 0; k < flat_data.GetLength(); ++k){
-        Matrix_elem<T> temp_get_sum = flat_data.Get(k);
+    for (size_t k = 0; k < real_data.GetLength(); ++k){
+        Matrix_elem<T> temp_get_sum = real_data.Get(k);
 
         T sum = temp_get_sum.elem + other.Get_elem(temp_get_sum.i, temp_get_sum.j);
         if (sum != T()){
@@ -141,19 +139,19 @@ SparseMatrix<Container, T> SparseMatrix<Container, T>::operator*(const SparseMat
         throw InvalidSizeException(std::format("Умножение невозможно: столбцы левой ( {}) != строки правой ( {})", cols, other.rows));
     }
     Container<Matrix_elem<T>> result;
-    auto flat_data = Get_Elements();
+    auto real_data = Get_Elements();
 
     for (size_t i = 0; i < rows; ++i){
         for (size_t j = 0; j < other.cols; ++j){
-            T current_sum = T();
-            for (size_t k = 0; k < flat_data.GetLength(); ++k){
-                Matrix_elem<T> temp_sum = flat_data.Get(k);
+            T now_elem_sum = T();
+            for (size_t k = 0; k < real_data.GetLength(); ++k){
+                Matrix_elem<T> temp_sum = real_data.Get(k);
                 if (temp_sum.i == i){
-                    current_sum += temp_sum.elem * other.Get_elem(temp_sum.j, j);
+                    now_elem_sum += temp_sum.elem * other.Get_elem(temp_sum.j, j);
                 }
             }
-            if (current_sum != T()){
-                result.Append(Matrix_elem<T>(current_sum, i, j));
+            if (now_elem_sum != T()){
+                result.Append(Matrix_elem<T>(now_elem_sum, i, j));
             }
         }
     }
@@ -164,10 +162,10 @@ SparseMatrix<Container, T> SparseMatrix<Container, T>::operator*(const SparseMat
 template <template <typename> class Container, typename T>
 T SparseMatrix<Container, T>::Get_Norm() const{
     T sum_sq = T();
-    auto flat_data = Get_Elements();
+    auto real_data = Get_Elements();
 
-    for (size_t k = 0; k < flat_data.GetLength(); ++k){
-        T val = flat_data.Get(k).elem;
+    for (size_t k = 0; k < real_data.GetLength(); ++k){
+        T val = real_data.Get(k).elem;
         sum_sq += val * val;
     }
 

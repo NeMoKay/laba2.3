@@ -3,7 +3,7 @@
 #include <iostream>
 #include <cstddef>
 #include <string>
-#include <format> // Не забудь подключить для std::format, если его нет
+#include <format>
 #include "exceptions.hpp"
 
 template <typename T > 
@@ -36,7 +36,7 @@ public:
     void Append(T item);
     void Prepend(T item);
     void InsertAt(T item, size_t index);
-    void Set(size_t index, T item); // <--- ДОБАВЛЕНО
+    void Set(size_t index, T item);
     LinkedList<T>* Concat(LinkedList<T> *list);
 
     ~LinkedList();
@@ -184,14 +184,14 @@ LinkedList<T>* LinkedList<T>::GetSubList(size_t startIndex, size_t endIndex){
 
     Node *now_elem = head;
     size_t index = 0;
-    size_t current_pos = 0;
+    size_t now_elem_pos = 0;
     while(now_elem != nullptr){
-        if(current_pos >= startIndex && current_pos <= endIndex){
+        if(now_elem_pos >= startIndex && now_elem_pos <= endIndex){
             items[index] = now_elem->value;
             index++;
         }
         now_elem = now_elem->next;
-        current_pos++;
+        now_elem_pos++;
     }
     LinkedList<T>* result = new LinkedList<T>(items, len);
     delete[] items;

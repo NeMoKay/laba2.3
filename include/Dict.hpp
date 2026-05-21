@@ -42,37 +42,37 @@ public:
         size_t hash = HashFunc(key);
         int index = hash;
         while (index != -1){
-            bucket<K, V> current = table.Get(index);
-            if (!current.is_empty && current.data.elem1 == key){
-                return current.data.elem2;
+            bucket<K, V> now_elem = table.Get(index);
+            if (!now_elem.is_empty && now_elem.data.elem1 == key){
+                return now_elem.data.elem2;
             }
-            index = current.next_idx;
+            index = now_elem.next_idx;
         }
         return V();
     }
 
     void Set(const K& key, const V& value){
         size_t hash = HashFunc(key);
-        bucket<K, V> current = table.Get(hash);
+        bucket<K, V> now_elem = table.Get(hash);
 
-        if (current.is_empty){
-            current.data = Pair<K, V>(key, value);
-            current.is_empty = false;
-            table.Set(hash, current);
+        if (now_elem.is_empty){
+            now_elem.data = Pair<K, V>(key, value);
+            now_elem.is_empty = false;
+            table.Set(hash, now_elem);
             return;
         }
 
         int index = hash;
         int last_idx = hash;
         while (index != -1){
-            current = table.Get(index);
-            if (!current.is_empty && current.data.elem1 == key){
-                current.data.elem2 = value;
-                table.Set(index, current);
+            now_elem = table.Get(index);
+            if (!now_elem.is_empty && now_elem.data.elem1 == key){
+                now_elem.data.elem2 = value;
+                table.Set(index, now_elem);
                 return;
             }
             last_idx = index;
-            index = current.next_idx;
+            index = now_elem.next_idx;
         }
 
         table.Append(bucket<K, V>(Pair<K, V>(key, value)));
@@ -84,9 +84,9 @@ public:
     Container<Pair<K, V>> Get_Items() const{
         Container<Pair<K, V>> items;
         for (size_t i = 0; i < table.GetLength(); ++i){
-            bucket<K, V> current = table.Get(i);
-            if (!current.is_empty){
-                items.Append(current.data);
+            bucket<K, V> now_elem = table.Get(i);
+            if (!now_elem.is_empty){
+                items.Append(now_elem.data);
             }
         }
         return items;

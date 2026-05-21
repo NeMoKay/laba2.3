@@ -62,7 +62,7 @@ std::string format_val(Complex val){
     }
     
     std::string sign = "";
-    if (val.im > 0){
+    if (val.im> 0){
         sign = "+";
     }
     
@@ -428,7 +428,7 @@ int main(){
         res.set_content(build_response(dt, log), "application/json");
     });
 
-    std::cout << "\n[Sparse Matrix GUI] -> http://localhost:8080\n";
+    std::cout << "\nhttp://localhost:8080\n";
     svr.listen("0.0.0.0", 8080);
     return 0;
 }

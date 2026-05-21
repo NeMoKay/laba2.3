@@ -3,6 +3,9 @@
 #include "SparseMatrix.hpp"
 #include "Complex.hpp"
 
+#include "Dict.hpp"
+#include "ArraySequence.hpp"
+
 class Sparse_Matrix_Fixture : public testing::Test{
 protected:
     SparseMatrix<ArraySequence, int>* empty_mat;
@@ -60,5 +63,19 @@ protected:
         delete mat_C;
         delete mat_complex_A;
         delete mat_complex_B;
+    }
+};
+
+
+class Dict_Test : public testing::Test{
+protected:
+    Dict<Pair<int, int>, double, ArraySequence>* dict;
+
+    void SetUp() override{
+        dict = new Dict<Pair<int, int>, double, ArraySequence>;
+    }
+
+    void TearDown() override{
+        delete dict;
     }
 };

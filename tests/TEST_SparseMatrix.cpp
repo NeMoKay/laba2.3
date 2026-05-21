@@ -69,7 +69,7 @@ TEST_F(Sparse_Matrix_Fixture, operator_mult_invalid_size){
     EXPECT_THROW((*mat_C) * (*mat_A), InvalidSizeException) << "Ожидается InvalidSizeException при умножении несовместимых матриц";
 }
 
-TEST_F(Sparse_Matrix_Fixture, get_norm) {
+TEST_F(Sparse_Matrix_Fixture, get_norm){
     EXPECT_EQ(mat_A->Get_Norm(), 7) << "Ожидается норма 7 для mat_A. По факту: " << mat_A->Get_Norm();
     
     EXPECT_EQ(mat_B->Get_Norm(), 5) << "Ожидается норма 5 для mat_B (sqrt(34) -> 5). По факту: " << mat_B->Get_Norm();

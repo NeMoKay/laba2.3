@@ -35,10 +35,10 @@ public:
 
 //public
 template <typename T >
-DynamicArray<T>::DynamicArray() : data(nullptr), size(0){}
+DynamicArray<T>::DynamicArray() : data(nullptr), size(0) {}
 
 template <typename T >
-DynamicArray<T>::DynamicArray(size_t count) : data(new T[count]), size(count){}
+DynamicArray<T>::DynamicArray(size_t count) : data(new T[count]), size(count) {}
 
 template <typename T >
 DynamicArray<T>::DynamicArray(T* items, size_t count) : DynamicArray(count){

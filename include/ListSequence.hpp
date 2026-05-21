@@ -23,6 +23,7 @@ protected:
     void AppendInternal(T item);
     void PrependInternal(T item);
     void InsertAtInternal(T item, size_t index);
+    void SetInternal(size_t index, T item);
     void ConcatInternal(Sequence<T>* list);
 
 public:
@@ -44,6 +45,7 @@ public:
     ListSequence<T>* Append(T item) override;
     ListSequence<T>* Prepend(T item) override;
     ListSequence<T>* InsertAt(T item, size_t index) override;
+    ListSequence<T>* Set(size_t index, T item) override;
     Sequence<T>* Concat(Sequence<T>* list_p) override;
 
     ~ListSequence();
@@ -74,7 +76,7 @@ void ListSequence<T>::PrependInternal(T item){
 template <typename T >
 void ListSequence<T>::InsertAtInternal(T item, size_t index){
     if(index > items->GetLength()){
-        throw IndexOutOfRangeException(std::format("Индекс вне диапазона (индекс:{}, максимум:{})", index, items->GetLength()));
+        throw IndexOutOfRangeException(std::format("Индекс вне диапазона (индекс: {}, максимум: {})", index, items->GetLength()));
     }
     items->InsertAt(item, index);
 }
@@ -95,13 +97,13 @@ void ListSequence<T>::ConcatInternal(Sequence<T>* list){
 // public
 
 template <typename T >
-ListSequence<T>::ListSequence() : items(new LinkedList<T>){}
+ListSequence<T>::ListSequence() : items(new LinkedList<T>) {}
 
 template <typename T >
-ListSequence<T>::ListSequence(T* new_items, size_t count) : items(new LinkedList<T>(new_items, count)){}
+ListSequence<T>::ListSequence(T* new_items, size_t count) : items(new LinkedList<T>(new_items, count)) {}
 
 template <typename T >
-ListSequence<T>::ListSequence(const ListSequence<T>& list) : items(new LinkedList<T>(*(list.items))){}
+ListSequence<T>::ListSequence(const ListSequence<T>& list) : items(new LinkedList<T>(*(list.items))) {}
 
 template <typename T >
 ListSequence<T>::ListSequence(const ArraySequence<T>& arraySeq) : ListSequence(){
@@ -133,7 +135,7 @@ ListSequence<T>* ListSequence<T>::GetSubsequence(size_t startIndex, size_t endIn
 
     if(endIndex < startIndex || startIndex >= items->GetLength() || endIndex >= items->GetLength()){
 
-        throw IndexOutOfRangeException(std::format("Ошибка индекса (start:{}, end:{}, size:{})", startIndex, endIndex, items->GetLength()));
+        throw IndexOutOfRangeException(std::format("Ошибка индекса (start: {}, end: {}, size: {})", startIndex, endIndex, items->GetLength()));
     }
 
     LinkedList<T>* items_sub_list;
@@ -148,30 +150,30 @@ ListSequence<T>* ListSequence<T>::GetSubsequence(size_t startIndex, size_t endIn
     return Sub_list;
 }
 
-template <typename T >
+template <typename T>
 size_t ListSequence<T>::GetLength() const{
     return items->GetLength();
 }
 
-template <typename T >
+template <typename T>
 ListSequence<T>* ListSequence<T>::Append(T item){
     ListSequence<T>* list = Instance();
     list->AppendInternal(item);
     return list;
 }
 
-template <typename T >
+template <typename T>
 ListSequence<T>* ListSequence<T>::Prepend(T item){
     ListSequence<T>* list = Instance();
     list->PrependInternal(item);
     return list;
 }
 
-template <typename T >
+template <typename T>
 ListSequence<T>* ListSequence<T>::InsertAt(T item, size_t index){
 
     if(index > items->GetLength()){
-        throw IndexOutOfRangeException(std::format("Индекс вне диапазона (индекс:{}, максимум:{})", index, items->GetLength()));
+        throw IndexOutOfRangeException(std::format("Индекс вне диапазона (индекс: {}, максимум: {})", index, items->GetLength()));
     }
 
     ListSequence<T>* list = Instance();
@@ -180,7 +182,7 @@ ListSequence<T>* ListSequence<T>::InsertAt(T item, size_t index){
     return list;
 }
 
-template <typename T >
+template <typename T>
 Sequence<T>* ListSequence<T>::Concat(Sequence<T>* list_p){
 
     ListSequence<T>* list = Instance();
@@ -196,9 +198,20 @@ Sequence<T>* ListSequence<T>::Concat(Sequence<T>* list_p){
     return list;
 }
 
-template <typename T >
+template <typename T>
 ListSequence<T>::~ListSequence(){
     delete items;
+}
+
+template <typename T>
+void ListSequence<T>::SetInternal(size_t index, T item){
+    items->Set(index, item);
+}
+template <typename T>
+ListSequence<T>* ListSequence<T>::Set(size_t index, T item){
+    ListSequence<T>* list = this->Instance();
+    list->SetInternal(index, item);
+    return list;
 }
 
 

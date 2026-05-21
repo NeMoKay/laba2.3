@@ -31,6 +31,7 @@ public:
     virtual Sequence<T>* Append(T item) = 0;
     virtual Sequence<T>* Prepend(T item) = 0;
     virtual Sequence<T>* InsertAt(T item, size_t index) = 0;
+    virtual Sequence<T>* Set(size_t index, T item) = 0;
     virtual Sequence <T>* Concat(Sequence <T> *list) = 0;
 
     SequenceStats<T> get_stats() const requires is_arithmetic_v<T>; 
@@ -50,7 +51,7 @@ SequenceStats<T> Sequence<T>::get_stats() const requires is_arithmetic_v<T>{
         throw EmptySequenceException("Список пуст");
     }
 
-    SequenceStats<T> Stats{};
+    SequenceStats<T> Stats {};
     Stats.max = this->Get(0);
     Stats.min = this->Get(0);
     Stats.avg = 0.0;

@@ -4,7 +4,7 @@
 #include "ArraySequence.hpp"
 #include "LinkedList.hpp"
 bool is_big(int x){ 
-    return x > 60; 
+    return x> 60; 
 }
 
 

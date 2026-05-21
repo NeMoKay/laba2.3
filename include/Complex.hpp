@@ -3,7 +3,7 @@
 struct Complex{
     double re, im;
 
-    Complex(double r = 0, double i = 0) : re(r), im(i){}
+    Complex(double r = 0, double i = 0) : re(r), im(i) {}
 
     Complex operator+(const Complex& other) const{
         return Complex(re + other.re, im + other.im);

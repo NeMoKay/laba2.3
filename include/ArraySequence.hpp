@@ -21,6 +21,7 @@ protected:
     void AppendInternal(T item);
     void PrependInternal(T item);
     void InsertAtInternal(T item, size_t index);
+    void SetInternal(size_t index, T item);
     void ConcatInternal(Sequence <T> *list);
     
 public:
@@ -38,6 +39,7 @@ public:
     ArraySequence<T>* Append(T item) override;
     ArraySequence<T>* Prepend(T item) override;
     ArraySequence<T>* InsertAt(T item, size_t index) override;
+    ArraySequence<T>* Set(size_t index, T item) override;
     ArraySequence<T>* Concat(Sequence<T>* list) override;
     Sequence<T> *ReflectSum() const override;
     
@@ -75,7 +77,7 @@ void ArraySequence<T>::PrependInternal(T item){
 template <typename T >
 void ArraySequence<T>::InsertAtInternal(T item, size_t index){
     if(index > items->GetSize()){
-        throw IndexOutOfRangeException(std::format("Ошибка индекса (переданный инндекс{} > максимальный индекс последовательности{})",index,  items->GetSize() - 1));
+        throw IndexOutOfRangeException(std::format("Ошибка индекса (переданный инндекс {} > максимальный индекс последовательности {})",index,  items->GetSize() - 1));
     }
 
     if(index == 0){
@@ -107,13 +109,13 @@ void ArraySequence<T>::ConcatInternal(Sequence <T> *list){
 
 //public
 template <typename T >
-ArraySequence<T>::ArraySequence(T* new_items, size_t count) : items(new DynamicArray<T>(new_items, count)){}
+ArraySequence<T>::ArraySequence(T* new_items, size_t count) : items(new DynamicArray<T>(new_items, count)) {}
 
 template <typename T >
-ArraySequence<T>::ArraySequence() : items(new DynamicArray<T>){}
+ArraySequence<T>::ArraySequence() : items(new DynamicArray<T>) {}
 
 template <typename T >
-ArraySequence<T>::ArraySequence(const ArraySequence<T>& operand) : items(new DynamicArray<T>(*(operand.items))){}
+ArraySequence<T>::ArraySequence(const ArraySequence<T>& operand) : items(new DynamicArray<T>(*(operand.items))) {}
 
 template <typename T >
 ArraySequence<T>::ArraySequence(const LinkedList<T>& list){
@@ -150,7 +152,7 @@ T ArraySequence<T>::GetLast() const{
 template <typename T >
 T ArraySequence<T>::Get(size_t index)const{
     if(index >= items->GetSize()){
-        throw IndexOutOfRangeException(std::format("Ошибка индекса (индекс{} >= размер{})", index, items->GetSize()));
+        throw IndexOutOfRangeException(std::format("Ошибка индекса (индекс {} >= размер {})", index, items->GetSize()));
     }
     return items->Get(index);
 }
@@ -163,7 +165,7 @@ size_t ArraySequence<T>::GetLength() const{
 template <typename T >
 ArraySequence<T>* ArraySequence<T>::GetSubsequence(size_t startIndex, size_t endIndex) const{
     if(endIndex < startIndex || startIndex >= items->GetSize() || endIndex >= items->GetSize()){
-        throw IndexOutOfRangeException(std::format("Ошибка индекса (start:{}, end:{}, size:{})", startIndex, endIndex, items->GetSize()));
+        throw IndexOutOfRangeException(std::format("Ошибка индекса (start: {}, end: {}, size: {})", startIndex, endIndex, items->GetSize()));
     }
     size_t len = endIndex-startIndex+1;
     ArraySequence<T>* new_arr = new ArraySequence<T>;
@@ -203,6 +205,18 @@ ArraySequence<T>* ArraySequence<T>::Concat(Sequence<T>* list){
     ArraySequence<T>* type_Arr = this->Instance();
     type_Arr->ConcatInternal(list);
     return type_Arr;
+}
+
+template <typename T >
+void ArraySequence<T>::SetInternal(size_t index, T item){
+    items->Set(index, item); 
+}
+
+template <typename T >
+ArraySequence<T>* ArraySequence<T>::Set(size_t index, T item){
+    ArraySequence<T>* arr = this->Instance();
+    arr->SetInternal(index, item);
+    return arr;
 }
 
 

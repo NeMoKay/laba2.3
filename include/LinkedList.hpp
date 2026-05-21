@@ -3,11 +3,8 @@
 #include <iostream>
 #include <cstddef>
 #include <string>
-
+#include <format> // Не забудь подключить для std::format, если его нет
 #include "exceptions.hpp"
-
- 
-
 
 template <typename T > 
 class LinkedList{
@@ -39,14 +36,13 @@ public:
     void Append(T item);
     void Prepend(T item);
     void InsertAt(T item, size_t index);
+    void Set(size_t index, T item); // <--- ДОБАВЛЕНО
     LinkedList<T>* Concat(LinkedList<T> *list);
 
     ~LinkedList();
 };
 
-
 //private Node
-
 template <typename T >
 LinkedList<T>::Node::Node(T new_value, Node *new_next, Node *new_prev){
     value = new_value;
@@ -67,9 +63,7 @@ LinkedList<T>::Node::Node(T val){
     value = val;
 }
 
-
 //public
-
 template <typename T >
 LinkedList<T>::LinkedList(T* items, size_t count){
     if(count == 0){
@@ -104,7 +98,7 @@ LinkedList<T>::LinkedList(T* items, size_t count){
 }
 
 template <typename T >
-LinkedList<T>::LinkedList() : head(nullptr), tail(nullptr){}
+LinkedList<T>::LinkedList() : head(nullptr), tail(nullptr) {}
 
 template <typename T >
 LinkedList<T>::LinkedList(const LinkedList<T>& list) : head(nullptr), tail(nullptr){
@@ -136,7 +130,7 @@ template <typename T >
 T LinkedList<T>::Get(size_t index) const{
     size_t length = GetLength();
     if(index >= length){
-        throw IndexOutOfRangeException(std::format("Индекс вне списка (индекс:{}, размер:{})", index, length));
+        throw IndexOutOfRangeException(std::format("Индекс вне списка (индекс: {}, размер: {})", index, length));
     }
 
     if(index < length / 2){
@@ -156,10 +150,33 @@ T LinkedList<T>::Get(size_t index) const{
 }
 
 template <typename T >
+void LinkedList<T>::Set(size_t index, T item){
+    size_t length = GetLength();
+    if(index >= length){
+        throw IndexOutOfRangeException(std::format("Индекс вне списка (индекс: {}, размер: {})", index, length));
+    }
+
+    if(index < length / 2){
+        Node *now_elem = head;
+        for(size_t i = 0; i < index; i++){
+            now_elem = now_elem->next;
+        }
+        now_elem->value = item;
+    }
+    else{
+        Node *now_elem = tail;
+        for(size_t i = 0; i < length - index - 1; i++){
+            now_elem = now_elem->prev;
+        }
+        now_elem->value = item;
+    }
+}
+
+template <typename T >
 LinkedList<T>* LinkedList<T>::GetSubList(size_t startIndex, size_t endIndex){
     size_t length = GetLength();
     if(endIndex < startIndex || startIndex >= length || endIndex >= length){
-        throw IndexOutOfRangeException(std::format("Ошибка индекса (start:{}, end:{}, size:{})", startIndex, endIndex, length));
+        throw IndexOutOfRangeException(std::format("Ошибка индекса (start: {}, end: {}, size: {})", startIndex, endIndex, length));
     }
 
     size_t len = endIndex - startIndex + 1;
@@ -228,7 +245,7 @@ template <typename T >
 void LinkedList<T>::InsertAt(T item, size_t index){
     size_t length = GetLength();
     if(index > length){
-        throw IndexOutOfRangeException(std::format("Индекс вне диапазона (индекс:{}, максимум:{})", index, length));
+        throw IndexOutOfRangeException(std::format("Индекс вне диапазона (индекс: {}, максимум: {})", index, length));
     }
 
     if(index == 0){

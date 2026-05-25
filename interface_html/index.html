@@ -115,6 +115,7 @@
                 </div>
                 <div id="grid-A" class="matrix-display"></div>
                 <button onclick="calcNorm('A')" style="margin-top: 15px; width: 100%; background: #3c096c;">Norm ||A||</button>
+                <button onclick="multScalar('A')" style="margin-top: 10px; width: 100%; background: #5a189a;">* Scalar</button>
             </div>
 
             <div class="matrix-card">
@@ -126,6 +127,7 @@
                 </div>
                 <div id="grid-B" class="matrix-display"></div>
                 <button onclick="calcNorm('B')" style="margin-top: 15px; width: 100%; background: #3c096c;">Norm ||B||</button>
+                <button onclick="multScalar('B')" style="margin-top: 10px; width: 100%; background: #5a189a;">* Scalar</button>
             </div>
         </div>
 
@@ -149,7 +151,7 @@
             let url = `/api/${endpoint}`;
             let options ={ method: 'GET' };
 
-            if (['create', 'set', 'add', 'mult', 'norm'].includes(endpoint)){
+            if (['create', 'set', 'add', 'mult', 'norm', 'mult_scalar'].includes(endpoint)){
                 options ={
                     method: 'POST',
                     headers:{ 'Content-Type': 'application/json' },
@@ -181,6 +183,26 @@
 
         function calcNorm(target){
             req('norm',{ target: target });
+        }
+
+        function multScalar(target){
+            const dt = document.getElementById('dataType').value;
+            const msg = dt === 'complex' ? `Enter scalar for ${target} (format: re,im or just re):` : `Enter scalar for ${target}:`;
+            const input = prompt(msg, "1");
+            
+            if (input === null) return;
+            
+            let re = 0, im = 0;
+            if (dt === 'complex'){
+                const parts = input.split(',').map(s => s.trim());
+                re = parseFloat(parts[0]) || 0;
+                im = parseFloat(parts[1]) || 0;
+            } 
+            else{
+                re = parseFloat(input) || 0;
+            }
+            
+            req('mult_scalar', { target: target, scalar_re: re, scalar_im: im });
         }
 
         function editCell(target, r, c){

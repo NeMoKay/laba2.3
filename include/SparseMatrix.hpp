@@ -48,6 +48,7 @@ public:
     T operator()(size_t i, size_t j) const;
     SparseMatrix operator+(const SparseMatrix& other) const;
     SparseMatrix operator*(const SparseMatrix& other) const;
+    SparseMatrix operator*(const T& scalar) const;
     T Get_Norm() const;
 
     ~SparseMatrix();
@@ -90,7 +91,6 @@ T SparseMatrix<Container, T>::Get_elem(size_t i, size_t j) const{
     if(i >= rows || j >= cols){
         throw IndexOutOfRangeException(std::format("i до {}, j до {}. Выход из диапазона", i, j));
     }
-
     return dict_data.Get(Pair<size_t, size_t>(i, j));
 }
 template <template <typename> class Container, typename T>
@@ -142,6 +142,7 @@ SparseMatrix<Container, T> SparseMatrix<Container, T>::operator+(const SparseMat
 }
 
 
+
 template <template <typename> class Container, typename T>
 SparseMatrix<Container, T> SparseMatrix<Container, T>::operator*(const SparseMatrix<Container, T>& other) const{
     if (cols != other.rows){
@@ -165,6 +166,25 @@ SparseMatrix<Container, T> SparseMatrix<Container, T>::operator*(const SparseMat
         }
     }
     return SparseMatrix<Container, T>(result, rows, other.cols);
+}
+template <template <typename> class Container, typename T>
+SparseMatrix<Container, T> SparseMatrix<Container, T>::operator*(const T& scalar) const {
+    Container<Matrix_elem<T>> result;
+
+    if (scalar != T()){
+        auto real_data = Get_Elements();
+
+        for (size_t k = 0; k < real_data.GetLength(); k++){
+            Matrix_elem<T> current_elem = real_data.Get(k);
+            T new_val = current_elem.elem * scalar;
+            
+            if (new_val != T()){
+                result.Append(Matrix_elem<T>(new_val, current_elem.i, current_elem.j));
+            }
+        }
+    }
+
+    return SparseMatrix<Container, T>(result, rows, cols);
 }
 
 

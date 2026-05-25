@@ -62,7 +62,7 @@ std::string format_val(Complex val){
     }
     
     std::string sign = "";
-    if (val.im> 0){
+    if (val.im > 0){
         sign = "+";
     }
     
@@ -373,6 +373,52 @@ int main(){
                 state_complex.Res = std::make_unique<SparseMatrix<ArraySequence, Complex>>(*(state_complex.A) * *(state_complex.B));
             }
             log = "Multiplication Successful";
+        } 
+        catch (const Exception& e){
+            log = "Math Error: " + std::string(e.what());
+        } 
+        catch (const std::exception& e){
+            log = "System Error: " + std::string(e.what());
+        }
+        res.set_content(build_response(dt, log), "application/json");
+    });
+
+    svr.Post("/api/mult_scalar", [](const httplib::Request& req, httplib::Response& res){
+        std::string log = "";
+        std::string dt = "int";
+        try{
+            auto body = json::parse(req.body);
+            dt = body.value("dataType", "int");
+            std::string target = body.value("target", "A");
+
+            if (dt == "int"){
+                int scalar = static_cast<int>(body.value("scalar_re", 0.0));
+                if (target == "A"){
+                    state_int.Res = std::make_unique<SparseMatrix<ArraySequence, int>>(*(state_int.A) * scalar);
+                } 
+                else{
+                    state_int.Res = std::make_unique<SparseMatrix<ArraySequence, int>>(*(state_int.B) * scalar);
+                }
+            } 
+            else if (dt == "double"){
+                double scalar = static_cast<double>(body.value("scalar_re", 0.0));
+                if (target == "A"){
+                    state_double.Res = std::make_unique<SparseMatrix<ArraySequence, double>>(*(state_double.A) * scalar);
+                } 
+                else{
+                    state_double.Res = std::make_unique<SparseMatrix<ArraySequence, double>>(*(state_double.B) * scalar);
+                }
+            } 
+            else if (dt == "complex"){
+                Complex scalar = Complex(body.value("scalar_re", 0.0), body.value("scalar_im", 0.0));
+                if (target == "A"){
+                    state_complex.Res = std::make_unique<SparseMatrix<ArraySequence, Complex>>(*(state_complex.A) * scalar);
+                } 
+                else{
+                    state_complex.Res = std::make_unique<SparseMatrix<ArraySequence, Complex>>(*(state_complex.B) * scalar);
+                }
+            }
+            log = "Scalar Multiplication Successful";
         } 
         catch (const Exception& e){
             log = "Math Error: " + std::string(e.what());

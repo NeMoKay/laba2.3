@@ -6,15 +6,38 @@
 
 #include <iostream>
 #include <string>
-#include <memory>
 
 using json = nlohmann::json;
 
 template <typename T>
 struct AppState{
-    std::unique_ptr<SparseMatrix<ArraySequence, T>> A = std::make_unique<SparseMatrix<ArraySequence, T>>(3, 3);
-    std::unique_ptr<SparseMatrix<ArraySequence, T>> B = std::make_unique<SparseMatrix<ArraySequence, T>>(3, 3);
-    std::unique_ptr<SparseMatrix<ArraySequence, T>> Res = nullptr;
+    SparseMatrix<ArraySequence, T>* A;
+    SparseMatrix<ArraySequence, T>* B;
+    SparseMatrix<ArraySequence, T>* Res;
+
+    AppState(){
+        A = new SparseMatrix<ArraySequence, T>(3, 3);
+        B = new SparseMatrix<ArraySequence, T>(3, 3);
+        Res = nullptr;
+    }
+
+    ~AppState() {
+        delete A;
+        delete B;
+        delete Res;
+    }
+
+    void Reset() {
+        delete A;
+        delete B;
+        delete Res;
+        A = new SparseMatrix<ArraySequence, T>(3, 3);
+        B = new SparseMatrix<ArraySequence, T>(3, 3);
+        Res = nullptr;
+    }
+    
+    AppState(const AppState&) = delete;
+    AppState& operator=(const AppState&) = delete;
 };
 
 AppState<int> state_int;
@@ -96,9 +119,9 @@ json matrixToJson(const SparseMatrix<ArraySequence, T>* mat){
 template <typename T>
 json serialize_state(const AppState<T>& state){
     json j;
-    j["A"] = matrixToJson(state.A.get());
-    j["B"] = matrixToJson(state.B.get());
-    j["Res"] = matrixToJson(state.Res.get());
+    j["A"] = matrixToJson(state.A);
+    j["B"] = matrixToJson(state.B);
+    j["Res"] = matrixToJson(state.Res);
     return j;
 }
 
@@ -131,9 +154,9 @@ int main(){
 
     svr.Get("/api/clear", [](const httplib::Request& req, httplib::Response& res){
         std::string dt = req.get_param_value("dataType");
-        state_int = AppState<int>();
-        state_double = AppState<double>();
-        state_complex = AppState<Complex>();
+        state_int.Reset();
+        state_double.Reset();
+        state_complex.Reset();
         res.set_content(build_response(dt, "All Matrices Cleared"), "application/json");
     });
 
@@ -149,29 +172,38 @@ int main(){
             
             if (dt == "int"){
                 if (target == "A"){
-                    state_int.A = std::make_unique<SparseMatrix<ArraySequence, int>>(r, c);
+                    delete state_int.A;
+                    state_int.A = new SparseMatrix<ArraySequence, int>(r, c);
                 } 
                 else{
-                    state_int.B = std::make_unique<SparseMatrix<ArraySequence, int>>(r, c);
+                    delete state_int.B;
+                    state_int.B = new SparseMatrix<ArraySequence, int>(r, c);
                 }
+                delete state_int.Res;
                 state_int.Res = nullptr;
             } 
             else if (dt == "double"){
                 if (target == "A"){
-                    state_double.A = std::make_unique<SparseMatrix<ArraySequence, double>>(r, c);
+                    delete state_double.A;
+                    state_double.A = new SparseMatrix<ArraySequence, double>(r, c);
                 } 
                 else{
-                    state_double.B = std::make_unique<SparseMatrix<ArraySequence, double>>(r, c);
+                    delete state_double.B;
+                    state_double.B = new SparseMatrix<ArraySequence, double>(r, c);
                 }
+                delete state_double.Res;
                 state_double.Res = nullptr;
             } 
             else if (dt == "complex"){
                 if (target == "A"){
-                    state_complex.A = std::make_unique<SparseMatrix<ArraySequence, Complex>>(r, c);
+                    delete state_complex.A;
+                    state_complex.A = new SparseMatrix<ArraySequence, Complex>(r, c);
                 } 
                 else{
-                    state_complex.B = std::make_unique<SparseMatrix<ArraySequence, Complex>>(r, c);
+                    delete state_complex.B;
+                    state_complex.B = new SparseMatrix<ArraySequence, Complex>(r, c);
                 }
+                delete state_complex.Res;
                 state_complex.Res = nullptr;
             }
             
@@ -229,11 +261,14 @@ int main(){
                     }
                 }
                 if (target == "A"){
-                    state_int.A = std::make_unique<SparseMatrix<ArraySequence, int>>(new_seq, R, C);
+                    delete state_int.A;
+                    state_int.A = new SparseMatrix<ArraySequence, int>(new_seq, R, C);
                 } 
                 else{
-                    state_int.B = std::make_unique<SparseMatrix<ArraySequence, int>>(new_seq, R, C);
+                    delete state_int.B;
+                    state_int.B = new SparseMatrix<ArraySequence, int>(new_seq, R, C);
                 }
+                delete state_int.Res;
                 state_int.Res = nullptr;
 
             } 
@@ -273,11 +308,14 @@ int main(){
                     }
                 }
                 if (target == "A"){
-                    state_double.A = std::make_unique<SparseMatrix<ArraySequence, double>>(new_seq, R, C);
+                    delete state_double.A;
+                    state_double.A = new SparseMatrix<ArraySequence, double>(new_seq, R, C);
                 } 
                 else{
-                    state_double.B = std::make_unique<SparseMatrix<ArraySequence, double>>(new_seq, R, C);
+                    delete state_double.B;
+                    state_double.B = new SparseMatrix<ArraySequence, double>(new_seq, R, C);
                 }
+                delete state_double.Res;
                 state_double.Res = nullptr;
 
             } 
@@ -317,11 +355,14 @@ int main(){
                     }
                 }
                 if (target == "A"){
-                    state_complex.A = std::make_unique<SparseMatrix<ArraySequence, Complex>>(new_seq, R, C);
+                    delete state_complex.A;
+                    state_complex.A = new SparseMatrix<ArraySequence, Complex>(new_seq, R, C);
                 } 
                 else{
-                    state_complex.B = std::make_unique<SparseMatrix<ArraySequence, Complex>>(new_seq, R, C);
+                    delete state_complex.B;
+                    state_complex.B = new SparseMatrix<ArraySequence, Complex>(new_seq, R, C);
                 }
+                delete state_complex.Res;
                 state_complex.Res = nullptr;
             }
             
@@ -339,13 +380,16 @@ int main(){
         try{
             dt = json::parse(req.body).value("dataType", "int");
             if (dt == "int"){
-                state_int.Res = std::make_unique<SparseMatrix<ArraySequence, int>>(*(state_int.A) + *(state_int.B));
+                delete state_int.Res;
+                state_int.Res = new SparseMatrix<ArraySequence, int>(*(state_int.A) + *(state_int.B));
             } 
             else if (dt == "double"){
-                state_double.Res = std::make_unique<SparseMatrix<ArraySequence, double>>(*(state_double.A) + *(state_double.B));
+                delete state_double.Res;
+                state_double.Res = new SparseMatrix<ArraySequence, double>(*(state_double.A) + *(state_double.B));
             } 
             else if (dt == "complex"){
-                state_complex.Res = std::make_unique<SparseMatrix<ArraySequence, Complex>>(*(state_complex.A) + *(state_complex.B));
+                delete state_complex.Res;
+                state_complex.Res = new SparseMatrix<ArraySequence, Complex>(*(state_complex.A) + *(state_complex.B));
             }
             log = "Addition Successful";
         } 
@@ -364,13 +408,16 @@ int main(){
         try{
             dt = json::parse(req.body).value("dataType", "int");
             if (dt == "int"){
-                state_int.Res = std::make_unique<SparseMatrix<ArraySequence, int>>(*(state_int.A) * *(state_int.B));
+                delete state_int.Res;
+                state_int.Res = new SparseMatrix<ArraySequence, int>(*(state_int.A) * *(state_int.B));
             } 
             else if (dt == "double"){
-                state_double.Res = std::make_unique<SparseMatrix<ArraySequence, double>>(*(state_double.A) * *(state_double.B));
+                delete state_double.Res;
+                state_double.Res = new SparseMatrix<ArraySequence, double>(*(state_double.A) * *(state_double.B));
             } 
             else if (dt == "complex"){
-                state_complex.Res = std::make_unique<SparseMatrix<ArraySequence, Complex>>(*(state_complex.A) * *(state_complex.B));
+                delete state_complex.Res;
+                state_complex.Res = new SparseMatrix<ArraySequence, Complex>(*(state_complex.A) * *(state_complex.B));
             }
             log = "Multiplication Successful";
         } 
@@ -393,29 +440,32 @@ int main(){
 
             if (dt == "int"){
                 int scalar = static_cast<int>(body.value("scalar_re", 0.0));
+                delete state_int.Res;
                 if (target == "A"){
-                    state_int.Res = std::make_unique<SparseMatrix<ArraySequence, int>>(*(state_int.A) * scalar);
+                    state_int.Res = new SparseMatrix<ArraySequence, int>(*(state_int.A) * scalar);
                 } 
                 else{
-                    state_int.Res = std::make_unique<SparseMatrix<ArraySequence, int>>(*(state_int.B) * scalar);
+                    state_int.Res = new SparseMatrix<ArraySequence, int>(*(state_int.B) * scalar);
                 }
             } 
             else if (dt == "double"){
                 double scalar = static_cast<double>(body.value("scalar_re", 0.0));
+                delete state_double.Res;
                 if (target == "A"){
-                    state_double.Res = std::make_unique<SparseMatrix<ArraySequence, double>>(*(state_double.A) * scalar);
+                    state_double.Res = new SparseMatrix<ArraySequence, double>(*(state_double.A) * scalar);
                 } 
                 else{
-                    state_double.Res = std::make_unique<SparseMatrix<ArraySequence, double>>(*(state_double.B) * scalar);
+                    state_double.Res = new SparseMatrix<ArraySequence, double>(*(state_double.B) * scalar);
                 }
             } 
             else if (dt == "complex"){
                 Complex scalar = Complex(body.value("scalar_re", 0.0), body.value("scalar_im", 0.0));
+                delete state_complex.Res;
                 if (target == "A"){
-                    state_complex.Res = std::make_unique<SparseMatrix<ArraySequence, Complex>>(*(state_complex.A) * scalar);
+                    state_complex.Res = new SparseMatrix<ArraySequence, Complex>(*(state_complex.A) * scalar);
                 } 
                 else{
-                    state_complex.Res = std::make_unique<SparseMatrix<ArraySequence, Complex>>(*(state_complex.B) * scalar);
+                    state_complex.Res = new SparseMatrix<ArraySequence, Complex>(*(state_complex.B) * scalar);
                 }
             }
             log = "Scalar Multiplication Successful";

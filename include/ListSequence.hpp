@@ -48,6 +48,10 @@ public:
     ListSequence<T>* Set(size_t index, T item) override;
     Sequence<T>* Concat(Sequence<T>* list_p) override;
 
+    using Iterator = typename LinkedList<T>::Iterator;
+    Iterator begin() const { return items->begin(); }
+    Iterator end() const { return items->end(); }
+
     ~ListSequence();
 };
 

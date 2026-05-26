@@ -42,6 +42,11 @@ public:
     ArraySequence<T>* Set(size_t index, T item) override;
     ArraySequence<T>* Concat(Sequence<T>* list) override;
     Sequence<T> *ReflectSum() const override;
+
+    using Iterator = typename DynamicArray<T>::Iterator;
+
+    Iterator begin() const {return items->begin();  }
+    Iterator end() const {return items->end(); }
     
     ~ArraySequence();
 };

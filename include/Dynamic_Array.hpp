@@ -30,6 +30,19 @@ public:
     T operator[](size_t index);
 
     ~DynamicArray();
+
+    class Iterator{
+    private:
+        T* ptr;
+    public:
+        Iterator(T* ptr);
+        T operator*() const;
+        Iterator& operator++();
+        bool operator!=(const Iterator& other) const;
+    };
+
+    Iterator begin() const;
+    Iterator end() const;
 };
 
 
@@ -107,4 +120,35 @@ T DynamicArray<T>::operator[](size_t index){
 template <typename T >
 DynamicArray<T>::~DynamicArray(){
     delete[] data;
+}
+
+
+
+template <typename T>
+DynamicArray<T>::Iterator::Iterator(T* ptr) : ptr(ptr) {}
+
+template <typename T>
+T DynamicArray<T>::Iterator::operator*() const{ 
+    return *ptr; 
+}
+
+template <typename T>
+typename DynamicArray<T>::Iterator& DynamicArray<T>::Iterator::operator++(){ 
+    ptr++; 
+    return *this; 
+}
+
+template <typename T>
+bool DynamicArray<T>::Iterator::operator!=(const Iterator& other) const{ 
+    return ptr != other.ptr;
+}
+
+template <typename T>
+typename DynamicArray<T>::Iterator DynamicArray<T>::begin() const{ 
+    return Iterator(data); 
+}
+
+template <typename T>
+typename DynamicArray<T>::Iterator DynamicArray<T>::end() const{ 
+    return Iterator(data + size); 
 }

@@ -40,6 +40,19 @@ public:
     LinkedList<T>* Concat(LinkedList<T> *list);
 
     ~LinkedList();
+
+    class Iterator{
+    private:
+        Node* current;
+    public:
+        Iterator(Node* node);
+        T operator*() const;
+        Iterator& operator++();
+        bool operator!=(const Iterator& other) const;
+    };
+
+    Iterator begin() const;
+    Iterator end() const;
 };
 
 //private Node
@@ -293,4 +306,35 @@ LinkedList<T>::~LinkedList(){
     }
     head = nullptr;
     tail = nullptr;
+}
+
+template <typename T>
+LinkedList<T>::Iterator::Iterator(Node* node) : current(node) {}
+
+template <typename T>
+T LinkedList<T>::Iterator::operator*() const{ 
+    return current->value; 
+}
+
+template <typename T>
+typename LinkedList<T>::Iterator& LinkedList<T>::Iterator::operator++(){ 
+    if (current != nullptr){
+        current = current->next;
+    }
+    return *this; 
+}
+
+template <typename T>
+bool LinkedList<T>::Iterator::operator!=(const Iterator& other) const{ 
+    return current != other.current; 
+}
+
+template <typename T>
+typename LinkedList<T>::Iterator LinkedList<T>::begin() const{ 
+    return Iterator(head); 
+}
+
+template <typename T>
+typename LinkedList<T>::Iterator LinkedList<T>::end() const{ 
+    return Iterator(nullptr); 
 }

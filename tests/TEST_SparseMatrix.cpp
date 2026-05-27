@@ -68,14 +68,19 @@ TEST_F(Sparse_Matrix_Fixture, operator_add){
     EXPECT_EQ(sum.Get_rows(), 3) << "Ожидается 3 строки.";
     EXPECT_EQ(sum.Get_cols(), 3) << "Ожидается 3 столбца.";
     
-    EXPECT_EQ(sum(0, 0), 1) << "Ожидаемая сумма 1";
-    EXPECT_EQ(sum(0, 2), 4) << "Ожидаемая сумма 4";
-    EXPECT_EQ(sum(1, 0), 1) << "Ожидаемая сумма 1";
-    EXPECT_EQ(sum(1, 1), 5) << "Ожидаемая сумма 5";
-    EXPECT_EQ(sum(2, 0), 4) << "Ожидаемая сумма 4";
-    EXPECT_EQ(sum(2, 2), 0) << "Ожидаемая сумма 0";
+    EXPECT_EQ(sum(0, 0), 0) << "Ожидаемый элемент по инжексу (0, 0) : 0";
+    EXPECT_EQ(sum(0, 2), 4) << "Ожидаемый элемент по инжексу (0, 2) : 4";
+    EXPECT_EQ(sum(1, 0), 1) << "Ожидаемый элемент по инжексу (1, 0) : 1";
+    EXPECT_EQ(sum(1, 1), 5) << "Ожидаемый элемент по инжексу (1, 1) : 5";
+    EXPECT_EQ(sum(2, 0), 4) << "Ожидаемый элемент по инжексу (2, 0) : 4";
+    EXPECT_EQ(sum(2, 2), 0) << "Ожидаемый элемент по инжексу (2, 2) : 0";
     
     if (testing::Test::HasFailure()){
+        std::cout << "\n---Тестируем оператор + для матриц A и B---\n";
+        std::cout << "\n---Матрица A---\n";
+        show_matrix(*orig_mat_A);
+        std::cout << "\n---Матрица B---\n";
+        show_matrix(*orig_mat_B);
         std::cout << "\n---Текущая матрица---\n";
         show_matrix(sum);
     }

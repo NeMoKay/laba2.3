@@ -18,6 +18,12 @@ protected:
     SparseMatrix<ArraySequence, Complex>* mat_complex_A;
     SparseMatrix<ArraySequence, Complex>* mat_complex_B;
 
+    SparseMatrix<ArraySequence, int>* orig_mat_A;
+    SparseMatrix<ArraySequence, int>* orig_mat_B;
+    SparseMatrix<ArraySequence, int>* orig_mat_C;
+    SparseMatrix<ArraySequence, Complex>* orig_mat_complex_A;
+    SparseMatrix<ArraySequence, Complex>* orig_mat_complex_B;
+
     void SetUp() override{
         empty_mat = new SparseMatrix<ArraySequence, int>;
         zero_mat = new SparseMatrix<ArraySequence, int>(3, 3);
@@ -53,16 +59,29 @@ protected:
         seq_comp_B.Append(Matrix_elem<Complex>(Complex(2.0, 1.0), 0, 0));
         seq_comp_B.Append(Matrix_elem<Complex>(Complex(1.0, 1.0), 1, 1));
         mat_complex_B = new SparseMatrix<ArraySequence, Complex>(seq_comp_B, 2, 2);
+
+        orig_mat_A = new SparseMatrix<ArraySequence, int>(*mat_A);
+        orig_mat_B = new SparseMatrix<ArraySequence, int>(*mat_B);
+        orig_mat_C = new SparseMatrix<ArraySequence, int>(*mat_C);
+        orig_mat_complex_A = new SparseMatrix<ArraySequence, Complex>(*mat_complex_A);
+        orig_mat_complex_B = new SparseMatrix<ArraySequence, Complex>(*mat_complex_B);
     }
 
     void TearDown() override{
         delete empty_mat;
         delete zero_mat;
+        
         delete mat_A;
         delete mat_B;
         delete mat_C;
         delete mat_complex_A;
         delete mat_complex_B;
+
+        delete orig_mat_A;
+        delete orig_mat_B;
+        delete orig_mat_C;
+        delete orig_mat_complex_A;
+        delete orig_mat_complex_B;
     }
 };
 

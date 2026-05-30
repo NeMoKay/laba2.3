@@ -21,6 +21,10 @@ struct SequenceStats{
 
 template <typename T>
 class Sequence{
+protected:
+    virtual Sequence<T>* DoReflectSum() const{
+        return nullptr;
+    }
 public:
     virtual ~Sequence() = default;
     virtual T GetFirst()  const = 0;
@@ -35,7 +39,14 @@ public:
     virtual Sequence <T>* Concat(Sequence <T> *list) = 0;
 
     SequenceStats<T> get_stats() const requires is_arithmetic_v<T>; 
-    virtual Sequence<T> *ReflectSum() const;
+    Sequence<T>* ReflectSum() const{
+        static_assert(std::is_arithmetic_v<T>, "ReflectSum доступен только для числовых типов");
+        
+        if (this->GetLength() == 0){
+            throw EmptySequenceException("ReflectSum: список пуст");
+        }
+        return DoReflectSum();
+    }
     size_t GetInversions() const;
 
     T operator[](size_t index){ 
@@ -70,13 +81,6 @@ SequenceStats<T> Sequence<T>::get_stats() const requires is_arithmetic_v<T>{
 
     return Stats;
 }
-
-template <typename T>
-Sequence<T>* Sequence<T>::ReflectSum() const{
-    throw InvalidSizeException("Нет реализации");
-}
-
-
 
 template <typename T>
 size_t Sequence<T>::GetInversions() const{

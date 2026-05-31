@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.19)
 project(ui_ui LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(Qt6 6.5 REQUIRED COMPONENTS Core Widgets)
@@ -15,15 +15,15 @@ qt_add_executable(ui_ui
     mainwindow.h
 )
 
-# Подключаем папку include из корня проекта LABA2.3
 target_include_directories(ui_ui PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/../include
+    ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 target_link_libraries(ui_ui
     PRIVATE
-        Qt::Core
-        Qt::Widgets
+        Qt6::Core
+        Qt6::Widgets
 )
 
 install(TARGETS ui_ui

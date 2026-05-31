@@ -1,336 +1,277 @@
 #include "mainwindow.h"
-#include "sparse_matrix_model.hpp"
-#include <QInputDialog>
+#include "resources.hpp"
+#include "SparseMatrix.hpp"
+#include "ArraySequence.hpp"
+#include "ListSequence.hpp"
+#include "Complex.hpp"
+#include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QFormLayout>
+#include <QPainter>
+#include <QGraphicsDropShadowEffect>
+#include <QMessageBox>
 #include <QHeaderView>
+#include <sstream>
 
-static QString globalStyle() {
-    return
-        "QMainWindow { background-color: #0f0518; }" 
-        "QLabel { color: #d4b3ff; font-weight: bold; font-size: 13px; }"
-        "QGroupBox { color: #d4b3ff; font-weight: bold; border: 1px solid #5a2e8c; border-radius: 5px; margin-top: 1ex; padding-top: 10px; }"
-        "QGroupBox::title { subcontrol-origin: margin; left: 10px; padding: 0 3px 0 3px; }"
-        "QSpinBox, QComboBox { background: #261138; color: #f0e6ff; border: 1px solid #5a2e8c; border-radius: 4px; padding: 3px; font-weight: bold; }"
-        "QComboBox QAbstractItemView { background: #261138; color: #f0e6ff; selection-background-color: #5a2e8c; }"
-        "QPushButton { background: #6121a8; color: white; border: none; border-radius: 6px; padding: 6px 15px; font-weight: bold; font-size: 14px; }"
-        "QPushButton:hover { background: #7c2de8; }"
-        "QPushButton:pressed { background: #4a1980; }"
-        "QTableWidget { background: #1a0b26; color: #e6ccff; gridline-color: #431f6e; border: 1px solid #5a2e8c; selection-background-color: #4a1980; }"
-        "QHeaderView::section { background: #261138; color: #d4b3ff; border: 1px solid #431f6e; font-weight: bold; }";
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
+{
+    setWindowTitle(APP_TITLE);
+    resize(1100, 800);
+    setStyleSheet(mainStyle());
+
+    tabs = new QTabWidget(this);
+    tabs->setGeometry(0, 0, 1100, 800);
+
+    tabOps = new QWidget();
+    tabs->addTab(tabOps, TAB_OPERATIONS);
+
+    setupOperationsTab();
 }
 
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
-    setWindowTitle("Sparse Matrix (Violet Edition)");
-    resize(1000, 600);
-    setStyleSheet(globalStyle());
-    setupUI();
-    registerEndpoints();
-    updateGrids(); 
+MainWindow::~MainWindow()
+{
 }
 
-MainWindow::~MainWindow() {}
+QString MainWindow::mainStyle() {
+    return STYLE_MAIN;
+}
 
-void MainWindow::setupUI() {
-    QWidget *centralWidget = new QWidget(this);
-    setCentralWidget(centralWidget);
-    QVBoxLayout *mainLayout = new QVBoxLayout(centralWidget);
+void MainWindow::paintEvent(QPaintEvent *event)
+{
+    QPainter painter(this);
+    painter.fillRect(rect(), QColor(30, 30, 30));
+    QMainWindow::paintEvent(event);
+}
 
-    QHBoxLayout *topLayout = new QHBoxLayout();
-    QGroupBox *groupParams = new QGroupBox("ПАРАМЕТРЫ МАТРИЦЫ", this);
-    QVBoxLayout *paramsLayout = new QVBoxLayout(groupParams);
-    
-    QHBoxLayout *rowColLayout = new QHBoxLayout();
-    labelRowsA = new QLabel("Row:", this);
-    spinRowsA = new QSpinBox(this);
-    spinRowsA->setRange(1, 20); spinRowsA->setValue(3);
-    
-    labelColsA = new QLabel("Col:", this);
-    spinColsA = new QSpinBox(this);
-    spinColsA->setRange(1, 20); spinColsA->setValue(3);
-    
-    rowColLayout->addWidget(labelRowsA);
-    rowColLayout->addWidget(spinRowsA);
-    rowColLayout->addSpacing(15);
-    rowColLayout->addWidget(labelColsA);
-    rowColLayout->addWidget(spinColsA);
-    rowColLayout->addStretch();
-    
-    QHBoxLayout *typeLayout = new QHBoxLayout();
-    labelType = new QLabel("Тип данных:", this);
-    comboType = new QComboBox(this);
-    comboType->addItems({"int", "double", "Complex"});
-    
-    typeLayout->addWidget(labelType);
-    typeLayout->addWidget(comboType);
-    typeLayout->addStretch();
-    
-    paramsLayout->addLayout(rowColLayout);
-    paramsLayout->addLayout(typeLayout);
-    
-    QGroupBox *groupControl = new QGroupBox("УПРАВЛЕНИЕ", this);
-    QVBoxLayout *controlLayout = new QVBoxLayout(groupControl);
-    
-    QHBoxLayout *containerLayout = new QHBoxLayout();
-    labelContainer = new QLabel("Контейнер:", this);
-    comboContainer = new QComboBox(this);
-    comboContainer->addItems({"ArraySequence", "ListSequence"});
-    containerLayout->addWidget(labelContainer);
-    containerLayout->addWidget(comboContainer);
-    containerLayout->addStretch();
-    
-    QHBoxLayout *opLayout = new QHBoxLayout();
-    labelOp = new QLabel("Операция:", this);
-    comboOp = new QComboBox(this);
-    comboOp->addItems({"Норма", "Умножить на скаляр", "Сложить матрицы", "Умножить матрицы"});
-    opLayout->addWidget(labelOp);
-    opLayout->addWidget(comboOp);
-    opLayout->addStretch();
-    
-    controlLayout->addLayout(containerLayout);
-    controlLayout->addLayout(opLayout);
+void MainWindow::normalizeTable(QTableWidget* table) {
+    table->horizontalHeader()->setMinimumSectionSize(60);
+    table->horizontalHeader()->setDefaultSectionSize(60);
+    table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
+    table->verticalHeader()->setMinimumSectionSize(30);
+    table->verticalHeader()->setDefaultSectionSize(30);
+    table->verticalHeader()->setSectionResizeMode(QHeaderView::Interactive);
+}
 
-    topLayout->addWidget(groupParams);
-    topLayout->addWidget(groupControl);
-    topLayout->addStretch();
-    mainLayout->addLayout(topLayout);
+void MainWindow::setupOperationsTab() {
+    QVBoxLayout *lay = new QVBoxLayout(tabOps);
+    lay->setSpacing(12);
+    lay->setContentsMargins(16, 16, 16, 16);
 
-    QHBoxLayout *midLayout = new QHBoxLayout();
-    btnCompute = new QPushButton("Вычислить", this);
-    btnCompute->setFixedSize(140, 35);
-    labelResult = new QLabel("", this);
-    labelResult->setStyleSheet("color: #00ffcc; font-size: 16px;");
+    groupSettings = new QGroupBox(TEXT_SETTINGS);
+    QFormLayout *setLay = new QFormLayout(groupSettings);
     
-    midLayout->addWidget(btnCompute);
-    midLayout->addWidget(labelResult);
-    midLayout->addStretch();
-    mainLayout->addLayout(midLayout);
+    comboDataType = new QComboBox();
+    comboDataType->addItems({TYPE_INT, TYPE_DOUBLE, TYPE_COMPLEX});
+    comboContainer = new QComboBox();
+    comboContainer->addItems({CONT_ARRAY, CONT_LIST});
+    comboOperation = new QComboBox();
+    comboOperation->addItems({OP_ADD, OP_MULT, OP_SCALAR, OP_NORM});
+    
+    setLay->addRow(TEXT_DATA_TYPE, comboDataType);
+    setLay->addRow(TEXT_CONTAINER, comboContainer);
+    setLay->addRow(TEXT_OPERATION, comboOperation);
+    lay->addWidget(groupSettings);
 
     QHBoxLayout *matricesLayout = new QHBoxLayout();
+
+    groupMatrixA = new QGroupBox(TEXT_MATRIX_A);
+    QVBoxLayout *aLay = new QVBoxLayout(groupMatrixA);
+    QHBoxLayout *dimLayA = new QHBoxLayout();
+    spinRowsA = new QSpinBox(); spinRowsA->setRange(1, 100); spinRowsA->setValue(3);
+    spinColsA = new QSpinBox(); spinColsA->setRange(1, 100); spinColsA->setValue(3);
+    dimLayA->addWidget(new QLabel(TEXT_ROWS));
+    dimLayA->addWidget(spinRowsA);
+    dimLayA->addWidget(new QLabel(TEXT_COLS));
+    dimLayA->addWidget(spinColsA);
+    dimLayA->addStretch();
+    aLay->addLayout(dimLayA);
+    tableA = new QTableWidget(3, 3);
+    normalizeTable(tableA);
+    aLay->addWidget(tableA);
+    matricesLayout->addWidget(groupMatrixA);
+
+    groupMatrixB = new QGroupBox(TEXT_MATRIX_B);
+    QVBoxLayout *bLay = new QVBoxLayout(groupMatrixB);
+    QHBoxLayout *dimLayB = new QHBoxLayout();
+    spinRowsB = new QSpinBox(); spinRowsB->setRange(1, 100); spinRowsB->setValue(3);
+    spinColsB = new QSpinBox(); spinColsB->setRange(1, 100); spinColsB->setValue(3);
+    dimLayB->addWidget(new QLabel(TEXT_ROWS));
+    dimLayB->addWidget(spinRowsB);
+    dimLayB->addWidget(new QLabel(TEXT_COLS));
+    dimLayB->addWidget(spinColsB);
+    dimLayB->addStretch();
+    bLay->addLayout(dimLayB);
+    tableB = new QTableWidget(3, 3);
+    normalizeTable(tableB);
+    bLay->addWidget(tableB);
+    matricesLayout->addWidget(groupMatrixB);
+
+    lay->addLayout(matricesLayout);
+
+    groupScalar = new QGroupBox(TEXT_SCALAR);
+    QFormLayout *sLay = new QFormLayout(groupScalar);
+    lineScalar = new QLineEdit();
+    sLay->addRow(TEXT_SCALAR, lineScalar);
+    groupScalar->setVisible(false);
+    lay->addWidget(groupScalar);
+
+    btnRun = new QPushButton(TEXT_RUN);
+    lay->addWidget(btnRun);
+
+    groupResult = new QGroupBox(TEXT_GROUP_RESULT);
+    QVBoxLayout *resLay = new QVBoxLayout(groupResult);
+    labelResultTitle = new QLabel(TEXT_RESULT_LBL);
+    labelResultTitle->setStyleSheet(STYLE_LABEL_RESULT);
     
-    QVBoxLayout *layoutA = new QVBoxLayout();
-    labelA = new QLabel("Матрица A:", this);
-    tableA = new QTableWidget(this);
-    layoutA->addWidget(labelA);
-    layoutA->addWidget(tableA);
-    matricesLayout->addLayout(layoutA);
+    QGraphicsDropShadowEffect *shadow = new QGraphicsDropShadowEffect();
+    shadow->setBlurRadius(6);
+    shadow->setColor(Qt::black);
+    shadow->setOffset(1, 1);
+    labelResultTitle->setGraphicsEffect(shadow);
+    resLay->addWidget(labelResultTitle);
+    
+    textResult = new QTextEdit();
+    textResult->setReadOnly(true);
+    textResult->setVisible(false);
+    resLay->addWidget(textResult);
 
-    widgetB = new QWidget(this);
-    QVBoxLayout *layoutB = new QVBoxLayout(widgetB);
-    layoutB->setContentsMargins(0,0,0,0);
-    labelB = new QLabel("Матрица B:", this);
-    tableB = new QTableWidget(this);
-    layoutB->addWidget(labelB);
-    layoutB->addWidget(tableB);
-    matricesLayout->addWidget(widgetB);
+    tableResult = new QTableWidget();
+    tableResult->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    normalizeTable(tableResult);
+    resLay->addWidget(tableResult);
+    
+    lay->addWidget(groupResult);
 
-    widgetResult = new QWidget(this);
-    QVBoxLayout *layoutRes = new QVBoxLayout(widgetResult);
-    layoutRes->setContentsMargins(0,0,0,0);
-    labelResultMatrix = new QLabel("Результат:", this);
-    tableResult = new QTableWidget(this);
-    layoutRes->addWidget(labelResultMatrix);
-    layoutRes->addWidget(tableResult);
-    matricesLayout->addWidget(widgetResult);
+    connect(spinRowsA, &QSpinBox::valueChanged, this, [this](int r) { tableA->setRowCount(r); });
+    connect(spinColsA, &QSpinBox::valueChanged, this, [this](int c) { tableA->setColumnCount(c); });
+    connect(spinRowsB, &QSpinBox::valueChanged, this, [this](int r) { tableB->setRowCount(r); });
+    connect(spinColsB, &QSpinBox::valueChanged, this, [this](int c) { tableB->setColumnCount(c); });
 
-    mainLayout->addLayout(matricesLayout);
-
-    widgetB->hide();
-    widgetResult->hide();
-
-    connect(spinRowsA, &QSpinBox::valueChanged, this, &MainWindow::updateGrids);
-    connect(spinColsA, &QSpinBox::valueChanged, this, &MainWindow::updateGrids);
-    connect(comboOp, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::updateGrids);
-    connect(btnCompute, &QPushButton::clicked, this, &MainWindow::onCompute);
+    connect(comboOperation, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::onOperationChanged);
+    connect(btnRun, &QPushButton::clicked, this, &MainWindow::onRun);
 }
 
-void MainWindow::registerEndpoints() {
-    endpoints["Норма"] = [this](SparseMatrixModel* m) { execNorm(m); };
-    endpoints["Умножить на скаляр"] = [this](SparseMatrixModel* m) { execScalar(m); };
-    endpoints["Сложить матрицы"] = [this](SparseMatrixModel* m) { execAdd(m); };
-    endpoints["Умножить матрицы"] = [this](SparseMatrixModel* m) { execMult(m); };
+void MainWindow::onOperationChanged(int index) {
+    groupMatrixB->setVisible(index == 0 || index == 1);
+    groupScalar->setVisible(index == 2);
+    tableResult->clearContents();
+    tableResult->setRowCount(0);
+    tableResult->setColumnCount(0);
+    textResult->clear();
+    textResult->setVisible(false);
+    tableResult->setVisible(true);
 }
 
-void MainWindow::syncTableSize(QTableWidget *tbl, int rows, int cols) {
-    int oldRows = tbl->rowCount();
-    int oldCols = tbl->columnCount();
-    
-    tbl->setRowCount(rows);
-    tbl->setColumnCount(cols);
-    tbl->horizontalHeader()->setDefaultSectionSize(55);
-    tbl->verticalHeader()->setDefaultSectionSize(30);
-    
-    for(int i = 0; i < rows; i++) {
-        for(int j = 0; j < cols; j++) {
-            if (i >= oldRows || j >= oldCols || !tbl->item(i, j)) {
-                QTableWidgetItem *item = new QTableWidgetItem("0");
-                item->setTextAlignment(Qt::AlignCenter);
-                tbl->setItem(i, j, item);
+template <typename T>
+T parseValue(const QString& str) {
+    if constexpr (std::is_same_v<T, Complex>) {
+        QStringList parts = str.split(",");
+        double re = parts.value(0).toDouble();
+        double im = parts.value(1).toDouble();
+        return Complex(re, im);
+    } else if constexpr (std::is_same_v<T, int>) {
+        return str.toInt();
+    } else {
+        return str.toDouble();
+    }
+}
+
+template <template <typename> class Container, typename T>
+SparseMatrix<Container, T> parseMatrixFromTable(QTableWidget* table) {
+    size_t r = table->rowCount();
+    size_t c = table->columnCount();
+    Container<Matrix_elem<T>> parsedElems;
+
+    for (int i = 0; i < r; ++i) {
+        for (int j = 0; j < c; ++j) {
+            QTableWidgetItem* item = table->item(i, j);
+            if (item && !item->text().trimmed().isEmpty()) {
+                T val = parseValue<T>(item->text().trimmed());
+                if (val != T()) {
+                    parsedElems.Append(Matrix_elem<T>(val, i, j));
+                }
             }
         }
     }
+    return SparseMatrix<Container, T>(parsedElems, r, c);
 }
 
-void MainWindow::updateGrids() {
-    QString op = comboOp->currentText();
-    int rA = spinRowsA->value();
-    int cA = spinColsA->value();
-    
-    syncTableSize(tableA, rA, cA);
-    widgetResult->hide();
-    labelResult->clear();
+template <template <typename> class Container, typename T>
+void displayResult(QTableWidget* tableResult, const SparseMatrix<Container, T>& result) {
+    tableResult->setRowCount(result.Get_rows());
+    tableResult->setColumnCount(result.Get_cols());
+    tableResult->clearContents();
 
-    if (op == "Сложить матрицы") {
-        labelB->setText(QString("Матрица B (%1x%2):").arg(rA).arg(cA));
-        widgetB->show();
-        syncTableSize(tableB, rA, cA);
-    } 
-    else if (op == "Умножить матрицы") {
-        labelB->setText(QString("Матрица B (%1x%2):").arg(cA).arg(rA));
-        widgetB->show();
-        syncTableSize(tableB, cA, rA);
-    } 
-    else {
-        widgetB->hide();
-    }
-}
-
-bool MainWindow::validateTable(QTableWidget *tbl) {
-    bool isComplex = (comboType->currentText() == "Complex");
-    for(int i = 0; i < tbl->rowCount(); i++) {
-        for(int j = 0; j < tbl->columnCount(); j++) {
-            QTableWidgetItem *item = tbl->item(i, j);
-            if (!item || item->text().trimmed().isEmpty()) continue;
-            
-            bool ok = true;
-            if (!isComplex) {
-                if (comboType->currentText() == "double") item->text().toDouble(&ok);
-                else item->text().toInt(&ok);
-            }
-
-            if (!ok) {
-                item->setBackground(QColor(150, 0, 0)); 
-                return false;
-            } else {
-                item->setBackground(QColor(38, 17, 56)); 
-            }
-        }
-    }
-    return true;
-}
-
-void MainWindow::showModel(QTableWidget *tbl, SparseMatrixModel *model) {
-    if (!model) return;
-    int r = (int)model->GetRows();
-    int c = (int)model->GetCols();
-    
-    tbl->clearContents();
-    tbl->setRowCount(r);
-    tbl->setColumnCount(c);
-    
-    for(int i = 0; i < r; i++) {
-        for(int j = 0; j < c; j++) {
-            QString valStr = model->GetElementStr(i, j);
-            QTableWidgetItem *item = new QTableWidgetItem(valStr);
-            item->setTextAlignment(Qt::AlignCenter);
-            
-            if (valStr != "0") {
-                item->setBackground(QColor(84, 27, 138)); 
-            } else {
-                item->setBackground(QColor(26, 11, 38)); 
-            }
-            tbl->setItem(i, j, item);
-        }
-    }
-    widgetResult->show();
-}
-
-void MainWindow::onCompute() {
-    if(!validateTable(tableA)) {
-        QMessageBox::warning(this, "Ошибка", "Матрица A содержит некорректные значения!");
-        return;
-    }
-
-    try {
-        SparseMatrixModel *modelA = ModelFactory::instance().create(
-            comboType->currentText(), 
-            comboContainer->currentText(), 
-            spinRowsA->value(), 
-            spinColsA->value(), 
-            tableA
-        );
-
-        labelResult->clear();
-        QString op = comboOp->currentText();
-
-        if (endpoints.count(op)) {
-            endpoints[op](modelA);
+    auto elems = result.Get_Elements();
+    for (size_t idx = 0; idx < elems.GetLength(); ++idx) {
+        auto item = elems.Get(idx);
+        QString valStr;
+        if constexpr (std::is_same_v<T, Complex>) {
+            std::stringstream ss;
+            ss << item.elem;
+            valStr = QString::fromStdString(ss.str());
+        } else if constexpr (std::is_same_v<T, int>) {
+            valStr = QString::number(item.elem);
         } else {
-            QMessageBox::warning(this, "Ошибка", "Неизвестная операция!");
+            valStr = QString::number(item.elem, 'f', 4);
         }
-
-        delete modelA;
-    } catch (const std::exception& e) {
-        QMessageBox::critical(this, "Ошибка выполнения", e.what());
+        QTableWidgetItem* cell = new QTableWidgetItem(valStr);
+        tableResult->setItem(item.i, item.j, cell);
     }
 }
 
-void MainWindow::execNorm(SparseMatrixModel *modelA) {
-    labelResult->setText("Норма: " + modelA->NormStr());
-}
+template <typename T, template <typename> class Container>
+void MainWindow::executeMatrixOperation() {
+    try {
+        SparseMatrix<Container, T> matrixA = parseMatrixFromTable<Container, T>(tableA);
+        int op = comboOperation->currentIndex();
 
-void MainWindow::execScalar(SparseMatrixModel *modelA) {
-    bool ok;
-    QString prompt = (comboType->currentText() == "Complex") ? "Введите комплексный скаляр (напр. 2+3i):" : "Введите скаляр:";
-    QString scalarStr = QInputDialog::getText(this, "Умножение", prompt, QLineEdit::Normal, "2", &ok);
-    
-    if (ok) {
-        SparseMatrixModel *res = modelA->ScalarMultiplyStr(scalarStr);
-        showModel(tableResult, res);
-        delete res;
-        labelResult->setText("Умножено на " + scalarStr);
+        if (op == 0) {
+            SparseMatrix<Container, T> matrixB = parseMatrixFromTable<Container, T>(tableB);
+            auto result = matrixA + matrixB;
+            textResult->setVisible(false);
+            tableResult->setVisible(true);
+            displayResult(tableResult, result);
+        } 
+        else if (op == 1) {
+            SparseMatrix<Container, T> matrixB = parseMatrixFromTable<Container, T>(tableB);
+            auto result = matrixA * matrixB;
+            textResult->setVisible(false);
+            tableResult->setVisible(true);
+            displayResult(tableResult, result);
+        } 
+        else if (op == 2) {
+            T scalar = parseValue<T>(lineScalar->text());
+            auto result = matrixA * scalar;
+            textResult->setVisible(false);
+            tableResult->setVisible(true);
+            displayResult(tableResult, result);
+        } 
+        else if (op == 3) {
+            T norm = matrixA.Get_Norm();
+            std::stringstream ss;
+            ss << norm;
+            tableResult->setVisible(false);
+            textResult->setVisible(true);
+            textResult->setPlainText(QString::fromStdString(ss.str()));
+        }
+    } catch (...) {
+        QMessageBox::warning(this, ERR_TITLE, ERR_INVALID_INPUT);
     }
 }
 
-void MainWindow::execAdd(SparseMatrixModel *modelA) {
-    if (!validateTable(tableB)) {
-        QMessageBox::warning(this, "Ошибка", "Матрица B содержит некорректные значения!");
-        return;
+template <typename T>
+void MainWindow::dispatchContainer() {
+    if (comboContainer->currentIndex() == 0) {
+        executeMatrixOperation<T, ArraySequence>();
+    } else {
+        executeMatrixOperation<T, ListSequence>();
     }
-    
-    SparseMatrixModel *modelB = ModelFactory::instance().create(
-        comboType->currentText(), 
-        comboContainer->currentText(), 
-        spinRowsA->value(), 
-        spinColsA->value(), 
-        tableB
-    );
-    
-    SparseMatrixModel *res = modelA->Add(*modelB);
-    showModel(tableResult, res);
-    delete modelB;
-    delete res;
-    labelResult->setText("Матрицы успешно сложены");
 }
 
-void MainWindow::execMult(SparseMatrixModel *modelA) {
-    if (!validateTable(tableB)) {
-        QMessageBox::warning(this, "Ошибка", "Матрица B содержит некорректные значения!");
-        return;
-    }
-    
-    int cA = spinColsA->value();
-    int cB = tableB->columnCount(); 
-    
-    SparseMatrixModel *modelB = ModelFactory::instance().create(
-        comboType->currentText(), 
-        comboContainer->currentText(), 
-        cA, 
-        cB, 
-        tableB
-    );
-    
-    SparseMatrixModel *res = modelA->Multiply(*modelB);
-    showModel(tableResult, res);
-    delete modelB;
-    delete res;
-    labelResult->setText("Матрицы успешно перемножены");
+void MainWindow::onRun() {
+    int typeIdx = comboDataType->currentIndex();
+    if (typeIdx == 0) dispatchContainer<int>();
+    else if (typeIdx == 1) dispatchContainer<double>();
+    else if (typeIdx == 2) dispatchContainer<Complex>();
 }

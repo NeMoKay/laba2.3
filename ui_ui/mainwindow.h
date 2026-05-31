@@ -1,53 +1,70 @@
-#pragma once
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
+
 #include <QMainWindow>
-#include <QPushButton>
+#include <QTabWidget>
+#include <QComboBox>
 #include <QLabel>
+#include <QLineEdit>
+#include <QPushButton>
+#include <QTextEdit>
+#include <QGroupBox>
 #include <QSpinBox>
 #include <QTableWidget>
-#include <QComboBox>
-#include <QMessageBox>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QGroupBox>
-#include <map>
-#include <functional>
-
-class SparseMatrixModel;
 
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = nullptr);
+    MainWindow(QWidget *parent = nullptr);
     ~MainWindow() override;
 
+protected:
+    void paintEvent(QPaintEvent *event) override;
+
 private slots:
-    void updateGrids();
-    void onCompute();
+    void onOperationChanged(int index);
+    void onRun();
 
 private:
-    QLabel *labelRowsA, *labelColsA;      
-    QSpinBox *spinRowsA, *spinColsA;
-    QLabel *labelType, *labelContainer, *labelOp;
-    QComboBox *comboType, *comboContainer, *comboOp;
-    QPushButton *btnCompute;
-    QLabel *labelA, *labelB, *labelResultMatrix, *labelResult;        
-    QTableWidget *tableA, *tableB, *tableResult;
-    QWidget *widgetB;
-    QWidget *widgetResult;
+    void setupOperationsTab();
+    QString mainStyle();
+    void normalizeTable(QTableWidget* table);
 
-    using Endpoint = std::function<void(SparseMatrixModel*)>;
-    std::map<QString, Endpoint> endpoints;
+    template <typename T, template <typename> class Container>
+    void executeMatrixOperation();
 
-    void setupUI();
-    void registerEndpoints();
-    void syncTableSize(QTableWidget *tbl, int rows, int cols);
-    bool validateTable(QTableWidget *tbl);
-    void showModel(QTableWidget *tbl, SparseMatrixModel *model);
+    template <typename T>
+    void dispatchContainer();
 
-    void execNorm(SparseMatrixModel* modelA);
-    void execScalar(SparseMatrixModel* modelA);
-    void execAdd(SparseMatrixModel* modelA);
-    void execMult(SparseMatrixModel* modelA);
+    QTabWidget *tabs;
+    QWidget *tabOps;
+
+    QGroupBox *groupSettings;
+    QComboBox *comboDataType;
+    QComboBox *comboContainer;
+    QComboBox *comboOperation;
+
+    QGroupBox *groupMatrixA;
+    QSpinBox *spinRowsA;
+    QSpinBox *spinColsA;
+    QTableWidget *tableA;
+
+    QGroupBox *groupMatrixB;
+    QSpinBox *spinRowsB;
+    QSpinBox *spinColsB;
+    QTableWidget *tableB;
+
+    QGroupBox *groupScalar;
+    QLineEdit *lineScalar;
+
+    QPushButton *btnRun;
+
+    QGroupBox *groupResult;
+    QLabel *labelResultTitle;
+    QTextEdit *textResult;
+    QTableWidget *tableResult;
 };
+
+#endif

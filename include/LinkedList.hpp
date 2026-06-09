@@ -23,14 +23,16 @@ private:
     Node *tail;
     
 public:
-    LinkedList(T* items, size_t count);
+    template <size_t N>
+    LinkedList(T (&arr)[N]);
+    
     LinkedList();
     LinkedList(const LinkedList<T>& list);
 
-    T GetFirst();
-    T GetLast();
+    T GetFirst() const;
+    T GetLast() const;
     T Get(size_t index) const;
-    LinkedList<T>* GetSubList(size_t startIndex, size_t endIndex);
+    LinkedList<T>* GetSubList(size_t startIndex, size_t endIndex) const;
     size_t GetLength() const;
 
     void Append(T item);
@@ -77,13 +79,11 @@ LinkedList<T>::Node::Node(T val){
 }
 
 //public
-template <typename T >
-LinkedList<T>::LinkedList(T* items, size_t count){
-    if(count == 0){
+template <typename T>
+template <size_t N>
+LinkedList<T>::LinkedList(T (&arr)[N]){
+    if(N == 0){
         throw InvalidSizeException("Размер <= 0 ");
-    }
-    if(items == nullptr){
-        throw NullPtrException("Переданный масив пуст");
     }
 
     head = nullptr;
@@ -91,10 +91,10 @@ LinkedList<T>::LinkedList(T* items, size_t count){
     Node *prev_elem = nullptr;
     Node *now_elem = nullptr;
 
-    for(size_t i = 0; i < count; i++){
+    for(size_t i = 0; i < N; i++){
         now_elem = new Node;
 
-        now_elem->value = items[i];
+        now_elem->value = arr[i];
         now_elem->prev = prev_elem;
         if(i != 0){
             prev_elem->next = now_elem;
@@ -104,7 +104,7 @@ LinkedList<T>::LinkedList(T* items, size_t count){
         if(i == 0){
             head = now_elem;
         }
-        if(i == count - 1){
+        if(i == N - 1){
             tail = now_elem;
         }
     }
@@ -124,7 +124,7 @@ LinkedList<T>::LinkedList(const LinkedList<T>& list) : head(nullptr), tail(nullp
 }
 
 template <typename T >
-T LinkedList<T>::GetFirst(){
+T LinkedList<T>::GetFirst() const{
     if(head == nullptr){
         throw EmptySequenceException("Список пуст");
     }
@@ -132,7 +132,7 @@ T LinkedList<T>::GetFirst(){
 }
 
 template <typename T >
-T LinkedList<T>::GetLast(){
+T LinkedList<T>::GetLast() const{
     if(tail == nullptr){
         throw EmptySequenceException("Список пуст");
     }
@@ -186,28 +186,24 @@ void LinkedList<T>::Set(size_t index, T item){
 }
 
 template <typename T >
-LinkedList<T>* LinkedList<T>::GetSubList(size_t startIndex, size_t endIndex){
+LinkedList<T>* LinkedList<T>::GetSubList(size_t startIndex, size_t endIndex) const{
     size_t length = GetLength();
     if(endIndex < startIndex || startIndex >= length || endIndex >= length){
         throw IndexOutOfRangeException(std::format("Ошибка индекса (start: {}, end: {}, size: {})", startIndex, endIndex, length));
     }
 
-    size_t len = endIndex - startIndex + 1;
-    T* items = new T[len];
+    LinkedList<T>* result = new LinkedList<T>();
 
     Node *now_elem = head;
-    size_t index = 0;
-    size_t now_elem_pos = 0;
+    size_t current_pos = 0;
     while(now_elem != nullptr){
-        if(now_elem_pos >= startIndex && now_elem_pos <= endIndex){
-            items[index] = now_elem->value;
-            index++;
+        if(current_pos >= startIndex && current_pos <= endIndex){
+            result->Append(now_elem->value);
         }
         now_elem = now_elem->next;
-        now_elem_pos++;
+        current_pos++;
     }
-    LinkedList<T>* result = new LinkedList<T>(items, len);
-    delete[] items;
+
     return result;
 }
 

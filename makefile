@@ -30,5 +30,6 @@ ui:
 clean:
 	rm -f $(OBJ_MAIN) main test
 	rm -rf ui_ui/build
+	find . -name ".DS_Store" -type f -delete
 
 .PHONY: main test clean ui

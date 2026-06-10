@@ -32,7 +32,7 @@ MainWindow::~MainWindow()
 {
 }
 
-QString MainWindow::mainStyle() {
+QString MainWindow::mainStyle(){
     return STYLE_MAIN;
 }
 
@@ -43,7 +43,7 @@ void MainWindow::paintEvent(QPaintEvent *event)
     QMainWindow::paintEvent(event);
 }
 
-void MainWindow::normalizeTable(QTableWidget* table) {
+void MainWindow::normalizeTable(QTableWidget* table){
     table->horizontalHeader()->setMinimumSectionSize(60);
     table->horizontalHeader()->setDefaultSectionSize(60);
     table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
@@ -52,7 +52,7 @@ void MainWindow::normalizeTable(QTableWidget* table) {
     table->verticalHeader()->setSectionResizeMode(QHeaderView::Interactive);
 }
 
-void MainWindow::setupOperationsTab() {
+void MainWindow::setupOperationsTab(){
     QVBoxLayout *lay = new QVBoxLayout(tabOps);
     lay->setSpacing(12);
     lay->setContentsMargins(16, 16, 16, 16);
@@ -142,16 +142,16 @@ void MainWindow::setupOperationsTab() {
     
     lay->addWidget(groupResult);
 
-    connect(spinRowsA, &QSpinBox::valueChanged, this, [this](int r) { tableA->setRowCount(r); });
-    connect(spinColsA, &QSpinBox::valueChanged, this, [this](int c) { tableA->setColumnCount(c); });
-    connect(spinRowsB, &QSpinBox::valueChanged, this, [this](int r) { tableB->setRowCount(r); });
-    connect(spinColsB, &QSpinBox::valueChanged, this, [this](int c) { tableB->setColumnCount(c); });
+    connect(spinRowsA, &QSpinBox::valueChanged, this, [this](int r){ tableA->setRowCount(r); });
+    connect(spinColsA, &QSpinBox::valueChanged, this, [this](int c){ tableA->setColumnCount(c); });
+    connect(spinRowsB, &QSpinBox::valueChanged, this, [this](int r){ tableB->setRowCount(r); });
+    connect(spinColsB, &QSpinBox::valueChanged, this, [this](int c){ tableB->setColumnCount(c); });
 
     connect(comboOperation, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::onOperationChanged);
     connect(btnRun, &QPushButton::clicked, this, &MainWindow::onRun);
 }
 
-void MainWindow::onOperationChanged(int index) {
+void MainWindow::onOperationChanged(int index){
     groupMatrixB->setVisible(index == 0 || index == 1);
     groupScalar->setVisible(index == 2);
     tableResult->clearContents();
@@ -163,31 +163,31 @@ void MainWindow::onOperationChanged(int index) {
 }
 
 template <typename T>
-T parseValue(const QString& str) {
-    if constexpr (std::is_same_v<T, Complex>) {
+T parseValue(const QString& str){
+    if constexpr (std::is_same_v<T, Complex>){
         QStringList parts = str.split(",");
         double re = parts.value(0).toDouble();
         double im = parts.value(1).toDouble();
         return Complex(re, im);
-    } else if constexpr (std::is_same_v<T, int>) {
+    } else if constexpr (std::is_same_v<T, int>){
         return str.toInt();
-    } else {
+    } else{
         return str.toDouble();
     }
 }
 
 template <template <typename> class Container, typename T>
-SparseMatrix<Container, T> parseMatrixFromTable(QTableWidget* table) {
+SparseMatrix<Container, T> parseMatrixFromTable(QTableWidget* table){
     size_t r = table->rowCount();
     size_t c = table->columnCount();
     Container<Matrix_elem<T>> parsedElems;
 
-    for (int i = 0; i < r; ++i) {
-        for (int j = 0; j < c; ++j) {
+    for (int i = 0; i < r; ++i){
+        for (int j = 0; j < c; ++j){
             QTableWidgetItem* item = table->item(i, j);
-            if (item && !item->text().trimmed().isEmpty()) {
+            if (item && !item->text().trimmed().isEmpty()){
                 T val = parseValue<T>(item->text().trimmed());
-                if (val != T()) {
+                if (val != T()){
                     parsedElems.Append(Matrix_elem<T>(val, i, j));
                 }
             }
@@ -197,22 +197,22 @@ SparseMatrix<Container, T> parseMatrixFromTable(QTableWidget* table) {
 }
 
 template <template <typename> class Container, typename T>
-void displayResult(QTableWidget* tableResult, const SparseMatrix<Container, T>& result) {
+void displayResult(QTableWidget* tableResult, const SparseMatrix<Container, T>& result){
     tableResult->setRowCount(result.Get_rows());
     tableResult->setColumnCount(result.Get_cols());
     tableResult->clearContents();
 
     auto elems = result.Get_Elements();
-    for (size_t idx = 0; idx < elems.GetLength(); ++idx) {
+    for (size_t idx = 0; idx < elems.GetLength(); ++idx){
         auto item = elems.Get(idx);
         QString valStr;
-        if constexpr (std::is_same_v<T, Complex>) {
+        if constexpr (std::is_same_v<T, Complex>){
             std::stringstream ss;
             ss << item.elem;
             valStr = QString::fromStdString(ss.str());
-        } else if constexpr (std::is_same_v<T, int>) {
+        } else if constexpr (std::is_same_v<T, int>){
             valStr = QString::number(item.elem);
-        } else {
+        } else{
             valStr = QString::number(item.elem, 'f', 4);
         }
         QTableWidgetItem* cell = new QTableWidgetItem(valStr);
@@ -221,33 +221,33 @@ void displayResult(QTableWidget* tableResult, const SparseMatrix<Container, T>& 
 }
 
 template <typename T, template <typename> class Container>
-void MainWindow::executeMatrixOperation() {
-    try {
+void MainWindow::executeMatrixOperation(){
+    try{
         SparseMatrix<Container, T> matrixA = parseMatrixFromTable<Container, T>(tableA);
         int op = comboOperation->currentIndex();
 
-        if (op == 0) {
+        if (op == 0){
             SparseMatrix<Container, T> matrixB = parseMatrixFromTable<Container, T>(tableB);
             auto result = matrixA + matrixB;
             textResult->setVisible(false);
             tableResult->setVisible(true);
             displayResult(tableResult, result);
         } 
-        else if (op == 1) {
+        else if (op == 1){
             SparseMatrix<Container, T> matrixB = parseMatrixFromTable<Container, T>(tableB);
             auto result = matrixA * matrixB;
             textResult->setVisible(false);
             tableResult->setVisible(true);
             displayResult(tableResult, result);
         } 
-        else if (op == 2) {
+        else if (op == 2){
             T scalar = parseValue<T>(lineScalar->text());
             auto result = matrixA * scalar;
             textResult->setVisible(false);
             tableResult->setVisible(true);
             displayResult(tableResult, result);
         } 
-        else if (op == 3) {
+        else if (op == 3){
             T norm = matrixA.Get_Norm();
             std::stringstream ss;
             ss << norm;
@@ -255,21 +255,21 @@ void MainWindow::executeMatrixOperation() {
             textResult->setVisible(true);
             textResult->setPlainText(QString::fromStdString(ss.str()));
         }
-    } catch (...) {
+    } catch (...){
         QMessageBox::warning(this, ERR_TITLE, ERR_INVALID_INPUT);
     }
 }
 
 template <typename T>
-void MainWindow::dispatchContainer() {
-    if (comboContainer->currentIndex() == 0) {
+void MainWindow::dispatchContainer(){
+    if (comboContainer->currentIndex() == 0){
         executeMatrixOperation<T, ArraySequence>();
-    } else {
+    } else{
         executeMatrixOperation<T, ListSequence>();
     }
 }
 
-void MainWindow::onRun() {
+void MainWindow::onRun(){
     int typeIdx = comboDataType->currentIndex();
     if (typeIdx == 0) dispatchContainer<int>();
     else if (typeIdx == 1) dispatchContainer<double>();

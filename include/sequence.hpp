@@ -95,3 +95,14 @@ size_t Sequence<T>::GetInversions() const{
     }
     return count;
 }
+
+
+
+class A{
+    int a;
+    std::string s;
+    A() : a(1) {}
+    A(std::initializer_list<char> s){
+
+    }
+};

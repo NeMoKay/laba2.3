@@ -1,6 +1,8 @@
 #pragma once
 #include <QString>
 
+//Ресурс с файлом перевода. папки под каждый язык, и опредляя систему.  
+
 const QString APP_TITLE = "Разреженные матрицы";
 const QString TAB_OPERATIONS = "Операции";
 

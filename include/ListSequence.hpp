@@ -51,8 +51,8 @@ public:
     Sequence<T>* Concat(Sequence<T>* list_p) override;
 
     using Iterator = typename LinkedList<T>::Iterator;
-    Iterator begin() const { return items.begin(); }
-    Iterator end() const { return items.end(); }
+    Iterator begin() const{ return items.begin(); }
+    Iterator end() const{ return items.end(); }
 
     ~ListSequence();
 };
@@ -197,7 +197,7 @@ Sequence<T>* ListSequence<T>::Concat(Sequence<T>* list_p){
 }
 
 template <typename T>
-ListSequence<T>::~ListSequence(){}
+ListSequence<T>::~ListSequence() {}
 
 template <typename T>
 void ListSequence<T>::SetInternal(size_t index, T item){
@@ -243,7 +243,7 @@ public:
 
 
 template <typename T>
-Sequence<T>* ListReflectSumImpl(const ListSequence<T>* seq) requires std::is_arithmetic_v<T> {
+Sequence<T>* ListReflectSumImpl(const ListSequence<T>* seq) requires std::is_arithmetic_v<T>{
     size_t len = seq->GetLength();
     ListSequence<T>* result = new ListSequence<T>();
     for(size_t i = 0; i < len; ++i){
@@ -253,7 +253,7 @@ Sequence<T>* ListReflectSumImpl(const ListSequence<T>* seq) requires std::is_ari
 }
 
 template <typename T>
-Sequence<T>* ListReflectSumImpl(const ListSequence<T>* seq) requires (!std::is_arithmetic_v<T>) {
+Sequence<T>* ListReflectSumImpl(const ListSequence<T>* seq) requires (!std::is_arithmetic_v<T>){
     return nullptr;
 }
 

@@ -47,8 +47,8 @@ public:
 
     using Iterator = typename DynamicArray<T>::Iterator;
 
-    Iterator begin() const {return items.begin();  }
-    Iterator end() const {return items.end(); }
+    Iterator begin() const{return items.begin();  }
+    Iterator end() const{return items.end(); }
     
     ~ArraySequence();
 };
@@ -213,7 +213,7 @@ ArraySequence<T>* ArraySequence<T>::Set(size_t index, T item){
 
 
 template <typename T>
-ArraySequence<T>::~ArraySequence(){}
+ArraySequence<T>::~ArraySequence() {}
 
 template <typename T>
 class MutableArraySequence : public ArraySequence<T>{
@@ -244,7 +244,7 @@ public:
 };
 
 template <typename T>
-Sequence<T>* ArrayReflectSumImpl(const ArraySequence<T>* seq) requires std::is_arithmetic_v<T> {
+Sequence<T>* ArrayReflectSumImpl(const ArraySequence<T>* seq) requires std::is_arithmetic_v<T>{
     size_t len = seq->GetLength();
     ArraySequence<T>* result = new ArraySequence<T>();
     for(size_t i = 0; i < len; ++i){
@@ -254,7 +254,7 @@ Sequence<T>* ArrayReflectSumImpl(const ArraySequence<T>* seq) requires std::is_a
 }
 
 template <typename T>
-Sequence<T>* ArrayReflectSumImpl(const ArraySequence<T>* seq) requires (!std::is_arithmetic_v<T>) {
+Sequence<T>* ArrayReflectSumImpl(const ArraySequence<T>* seq) requires (!std::is_arithmetic_v<T>){
     return nullptr;
 }
 

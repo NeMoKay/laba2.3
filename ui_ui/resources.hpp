@@ -1,15 +1,20 @@
 #pragma once
 #include <QString>
+#include <QLocale>
 
-//Ресурс с файлом перевода. папки под каждый язык, и опредляя систему.  
 
-const QString APP_TITLE = "Разреженные матрицы";
-const QString TAB_OPERATIONS = "Операции";
+inline bool isRussianSystem() {
+    static bool isRu = QLocale::system().name().startsWith("ru");
+    return isRu;
+}
 
-const QString TEXT_SETTINGS = "Настройки операции";
-const QString TEXT_DATA_TYPE = "Тип данных:";
-const QString TEXT_CONTAINER = "Контейнер:";
-const QString TEXT_OPERATION = "Операция:";
+#define APP_TITLE (isRussianSystem() ? "Разреженные матрицы" : "Sparse Matrices")
+#define TAB_OPERATIONS (isRussianSystem() ? "Операции" : "Operations")
+
+#define TEXT_SETTINGS (isRussianSystem() ? "Настройки операции" : "Operation Settings")
+#define TEXT_DATA_TYPE (isRussianSystem() ? "Тип данных:" : "Data Type:")
+#define TEXT_CONTAINER (isRussianSystem() ? "Контейнер:" : "Container:")
+#define TEXT_OPERATION (isRussianSystem() ? "Операция:" : "Operation:")
 
 const QString TYPE_INT = "int";
 const QString TYPE_DOUBLE = "double";
@@ -18,24 +23,24 @@ const QString TYPE_COMPLEX = "Complex";
 const QString CONT_ARRAY = "ArraySequence";
 const QString CONT_LIST = "ListSequence";
 
-const QString OP_ADD = "Сложение (A + B)";
-const QString OP_MULT = "Умножение (A * B)";
-const QString OP_SCALAR = "Умножение на скаляр (A * scalar)";
-const QString OP_NORM = "Норма матрицы (Norm(A))";
+#define OP_ADD (isRussianSystem() ? "Сложение (A + B)" : "Addition (A + B)")
+#define OP_MULT (isRussianSystem() ? "Умножение (A * B)" : "Multiplication (A * B)")
+#define OP_SCALAR (isRussianSystem() ? "Умножение на скаляр (A * scalar)" : "Scalar Multiplication (A * scalar)")
+#define OP_NORM (isRussianSystem() ? "Норма матрицы (Norm(A))" : "Matrix Norm (Norm(A))")
 
-const QString TEXT_MATRIX_A = "Матрица A";
-const QString TEXT_MATRIX_B = "Матрица B";
-const QString TEXT_SCALAR = "Скаляр";
-const QString TEXT_ROWS = "Строки:";
-const QString TEXT_COLS = "Столбцы:";
+#define TEXT_MATRIX_A (isRussianSystem() ? "Матрица A" : "Matrix A")
+#define TEXT_MATRIX_B (isRussianSystem() ? "Матрица B" : "Matrix B")
+#define TEXT_SCALAR (isRussianSystem() ? "Скаляр" : "Scalar")
+#define TEXT_ROWS (isRussianSystem() ? "Строки:" : "Rows:")
+#define TEXT_COLS (isRussianSystem() ? "Столбцы:" : "Cols:")
 
-const QString TEXT_RUN = "Вычислить";
-const QString TEXT_GROUP_RESULT = "Результат";
-const QString TEXT_RESULT_LBL = "Итог:";
+#define TEXT_RUN (isRussianSystem() ? "Вычислить" : "Calculate")
+#define TEXT_GROUP_RESULT (isRussianSystem() ? "Результат" : "Result")
+#define TEXT_RESULT_LBL (isRussianSystem() ? "Итог:" : "Total:")
 
-const QString ERR_TITLE = "Ошибка";
-const QString ERR_INVALID_INPUT = "Некорректный ввод данных.";
-const QString ERR_DIMS_MISMATCH = "Размеры матриц не совпадают или недопустимы для операции.";
+#define ERR_TITLE (isRussianSystem() ? "Ошибка" : "Error")
+#define ERR_INVALID_INPUT (isRussianSystem() ? "Некорректный ввод данных." : "Invalid input data.")
+#define ERR_DIMS_MISMATCH (isRussianSystem() ? "Размеры матриц не совпадают или недопустимы для операции." : "Matrix dimensions mismatch or invalid for operation.")
 
 const QString STYLE_LABEL_RESULT =
     "color: #a0c4ff; font-size: 13px; padding: 2px;";

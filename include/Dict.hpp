@@ -24,29 +24,11 @@ struct bucket{
 };
 
 
-
-// template <typename V>
-// size_t hash(V v) ;
-
-// template<>
-// size_t hash(int v) {
-// return v*31%30;
-// }
-
-// template<>
-// size_t hash(Pair v) {
-// return v*31%30;
-// }
-
-// template<>
-// size_t hash(Dict v) =delete;
-
 template <typename K, typename V, template <typename> class Container>
 class Dict{
 private:
     const int size_table = 100;
     Container<bucket<K, V>> table;
-    //делегирование 
     template <typename T1, typename T2>
     size_t HashFunc(const Pair<T1, T2>& key) const;
 

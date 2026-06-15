@@ -1,10 +1,46 @@
+#pragma once
+
 #include <gtest/gtest.h>
+#include <string>
+#include <iostream>
+#include <sstream>
 
 #include "SparseMatrix.hpp"
 #include "Complex.hpp"
-
 #include "Dict.hpp"
 #include "ArraySequence.hpp"
+
+
+template <typename T, template <typename> class Container>
+inline std::string show_matrix(const SparseMatrix<Container, T>& matrix){
+    std::stringstream ss;
+    Container<Matrix_elem<T>> items = matrix.Get_Elements(); 
+    ss << "Вывод элементов матрицы по индексу:\n";
+    for (size_t k = 0; k < items.GetLength(); ++k){
+        Matrix_elem<T> temp = items.Get(k); 
+        ss << "Элемент по индексам (" << temp.i << ", " << temp.j  << ") = " << temp.elem << "\n";
+    }
+    return ss.str();
+}
+
+
+
+#define MAT_EQ(actual, expected, mat) EXPECT_EQ(actual, expected) << "\nМатрица:\n" << show_matrix(mat)
+
+#define MAT_DOUBLE_EQ(actual, expected, mat) EXPECT_DOUBLE_EQ(actual, expected) << "\nМатрица:\n" << show_matrix(mat)
+
+#define MAT_THROW(statement, exc, mat) EXPECT_THROW(statement, exc) << "\nМатрица:\n" << show_matrix(mat)
+
+#define MAT_OP_EQ(actual, expected, m1, m2, res) \
+    EXPECT_EQ(actual, expected) << "\nМатрица 1:\n" << show_matrix(m1) \
+                                << "\nМатрица 2:\n" << show_matrix(m2) \
+                                << "\nРезультат:\n" << show_matrix(res)
+
+#define MAT_OP_THROW(statement, exc, m1, m2) \
+    EXPECT_THROW(statement, exc) << "\nМатрица 1:\n" << show_matrix(m1) \
+                                 << "\nМатрица 2:\n" << show_matrix(m2)
+
+
 
 class Sparse_Matrix_Fixture : public testing::Test{
 protected:
@@ -85,7 +121,6 @@ protected:
     }
 };
 
-
 class Dict_Fixture : public testing::Test{
 protected:
     Dict<Pair<int, int>, double, ArraySequence>* dict;
@@ -98,16 +133,3 @@ protected:
         delete dict;
     }
 };
-
-
-template <typename T, template <typename> class Container>
-inline void show_matrix(const SparseMatrix<Container, T>& matrix){
-    Container<Matrix_elem<T>> items = matrix.Get_Elements(); 
-    std::cout << "Вывод элементов матрицы по индексу:" << std::endl;
-
-    for (size_t k = 0; k < items.GetLength(); ++k){
-        Matrix_elem<T> temp = items.Get(k); 
-        std::cout << "Элемент по индексам (" << temp.i << ", " << temp.j  << ") = " << temp.elem << std::endl;
-    }
-    
-}

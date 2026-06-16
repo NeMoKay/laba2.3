@@ -15,7 +15,7 @@
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
-    setWindowTitle(APP_TITLE);
+    setWindowTitle(Resources::get_names().appTitle);
     resize(1100, 800);
     setStyleSheet(mainStyle());
 
@@ -23,7 +23,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     tabs->setGeometry(0, 0, 1100, 800);
 
     tabOps = new QWidget();
-    tabs->addTab(tabOps, TAB_OPERATIONS);
+    tabs->addTab(tabOps, Resources::get_names().tabOperations);
 
     setupOperationsTab();
 }
@@ -57,31 +57,31 @@ void MainWindow::setupOperationsTab(){
     lay->setSpacing(12);
     lay->setContentsMargins(16, 16, 16, 16);
 
-    groupSettings = new QGroupBox(TEXT_SETTINGS);
+    groupSettings = new QGroupBox(Resources::get_names().textSettings);
     QFormLayout *setLay = new QFormLayout(groupSettings);
     
     comboDataType = new QComboBox();
-    comboDataType->addItems({TYPE_INT, TYPE_DOUBLE, TYPE_COMPLEX});
+    comboDataType->addItems({Resources::TYPE_INT, Resources::TYPE_DOUBLE, Resources::TYPE_COMPLEX});
     comboContainer = new QComboBox();
-    comboContainer->addItems({CONT_ARRAY, CONT_LIST});
+    comboContainer->addItems({Resources::CONT_ARRAY, Resources::CONT_LIST});
     comboOperation = new QComboBox();
-    comboOperation->addItems({OP_ADD, OP_MULT, OP_SCALAR, OP_NORM});
+    comboOperation->addItems({Resources::get_names().opAdd, Resources::get_names().opMult, Resources::get_names().opScalar, Resources::get_names().opNorm});
     
-    setLay->addRow(TEXT_DATA_TYPE, comboDataType);
-    setLay->addRow(TEXT_CONTAINER, comboContainer);
-    setLay->addRow(TEXT_OPERATION, comboOperation);
+    setLay->addRow(Resources::get_names().textDataType, comboDataType);
+    setLay->addRow(Resources::get_names().textContainer, comboContainer);
+    setLay->addRow(Resources::get_names().textOperation, comboOperation);
     lay->addWidget(groupSettings);
 
     QHBoxLayout *matricesLayout = new QHBoxLayout();
 
-    groupMatrixA = new QGroupBox(TEXT_MATRIX_A);
+    groupMatrixA = new QGroupBox(Resources::get_names().textMatrixA);
     QVBoxLayout *aLay = new QVBoxLayout(groupMatrixA);
     QHBoxLayout *dimLayA = new QHBoxLayout();
     spinRowsA = new QSpinBox(); spinRowsA->setRange(1, 100); spinRowsA->setValue(3);
     spinColsA = new QSpinBox(); spinColsA->setRange(1, 100); spinColsA->setValue(3);
-    dimLayA->addWidget(new QLabel(TEXT_ROWS));
+    dimLayA->addWidget(new QLabel(Resources::get_names().textRows));
     dimLayA->addWidget(spinRowsA);
-    dimLayA->addWidget(new QLabel(TEXT_COLS));
+    dimLayA->addWidget(new QLabel(Resources::get_names().textCols));
     dimLayA->addWidget(spinColsA);
     dimLayA->addStretch();
     aLay->addLayout(dimLayA);
@@ -90,14 +90,14 @@ void MainWindow::setupOperationsTab(){
     aLay->addWidget(tableA);
     matricesLayout->addWidget(groupMatrixA);
 
-    groupMatrixB = new QGroupBox(TEXT_MATRIX_B);
+    groupMatrixB = new QGroupBox(Resources::get_names().textMatrixB);
     QVBoxLayout *bLay = new QVBoxLayout(groupMatrixB);
     QHBoxLayout *dimLayB = new QHBoxLayout();
     spinRowsB = new QSpinBox(); spinRowsB->setRange(1, 100); spinRowsB->setValue(3);
     spinColsB = new QSpinBox(); spinColsB->setRange(1, 100); spinColsB->setValue(3);
-    dimLayB->addWidget(new QLabel(TEXT_ROWS));
+    dimLayB->addWidget(new QLabel(Resources::get_names().textRows));
     dimLayB->addWidget(spinRowsB);
-    dimLayB->addWidget(new QLabel(TEXT_COLS));
+    dimLayB->addWidget(new QLabel(Resources::get_names().textCols));
     dimLayB->addWidget(spinColsB);
     dimLayB->addStretch();
     bLay->addLayout(dimLayB);
@@ -108,19 +108,19 @@ void MainWindow::setupOperationsTab(){
 
     lay->addLayout(matricesLayout);
 
-    groupScalar = new QGroupBox(TEXT_SCALAR);
+    groupScalar = new QGroupBox(Resources::get_names().textScalar);
     QFormLayout *sLay = new QFormLayout(groupScalar);
     lineScalar = new QLineEdit();
-    sLay->addRow(TEXT_SCALAR, lineScalar);
+    sLay->addRow(Resources::get_names().textScalar, lineScalar);
     groupScalar->setVisible(false);
     lay->addWidget(groupScalar);
 
-    btnRun = new QPushButton(TEXT_RUN);
+    btnRun = new QPushButton(Resources::get_names().textRun);
     lay->addWidget(btnRun);
 
-    groupResult = new QGroupBox(TEXT_GROUP_RESULT);
+    groupResult = new QGroupBox(Resources::get_names().textGroupResult);
     QVBoxLayout *resLay = new QVBoxLayout(groupResult);
-    labelResultTitle = new QLabel(TEXT_RESULT_LBL);
+    labelResultTitle = new QLabel(Resources::get_names().textResultLbl);
     labelResultTitle->setStyleSheet(STYLE_LABEL_RESULT);
     
     QGraphicsDropShadowEffect *shadow = new QGraphicsDropShadowEffect();
@@ -256,7 +256,7 @@ void MainWindow::executeMatrixOperation(){
             textResult->setPlainText(QString::fromStdString(ss.str()));
         }
     } catch (...){
-        QMessageBox::warning(this, ERR_TITLE, ERR_INVALID_INPUT);
+        QMessageBox::warning(this, Resources::get_names().errTitle, Resources::get_names().errInvalidInput);
     }
 }
 
@@ -264,7 +264,8 @@ template <typename T>
 void MainWindow::dispatchContainer(){
     if (comboContainer->currentIndex() == 0){
         executeMatrixOperation<T, ArraySequence>();
-    } else{
+    } 
+    else{
         executeMatrixOperation<T, ListSequence>();
     }
 }

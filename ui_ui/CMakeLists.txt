@@ -13,11 +13,16 @@ qt_add_executable(ui_ui
     main.cpp
     mainwindow.cpp
     mainwindow.h
+    Localization/LocalizationEn.h
+    Localization/LocalizationRu.h
+    Localization/resources.hpp
+    Localization/Style.h
 )
 
 target_include_directories(ui_ui PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/../include
     ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/Localization
 )
 
 target_link_libraries(ui_ui

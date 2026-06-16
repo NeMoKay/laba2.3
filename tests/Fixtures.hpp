@@ -25,20 +25,6 @@ inline std::string show_matrix(const SparseMatrix<Container, T>& matrix){
 
 
 
-#define MAT_EQ(actual, expected, mat) EXPECT_EQ(actual, expected) << "\nМатрица:\n" << show_matrix(mat)
-
-#define MAT_DOUBLE_EQ(actual, expected, mat) EXPECT_DOUBLE_EQ(actual, expected) << "\nМатрица:\n" << show_matrix(mat)
-
-#define MAT_THROW(statement, exc, mat) EXPECT_THROW(statement, exc) << "\nМатрица:\n" << show_matrix(mat)
-
-#define MAT_OP_EQ(actual, expected, m1, m2, res) \
-    EXPECT_EQ(actual, expected) << "\nМатрица 1:\n" << show_matrix(m1) \
-                                << "\nМатрица 2:\n" << show_matrix(m2) \
-                                << "\nРезультат:\n" << show_matrix(res)
-
-#define MAT_OP_THROW(statement, exc, m1, m2) \
-    EXPECT_THROW(statement, exc) << "\nМатрица 1:\n" << show_matrix(m1) \
-                                 << "\nМатрица 2:\n" << show_matrix(m2)
 
 
 

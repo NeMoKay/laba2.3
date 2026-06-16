@@ -28,7 +28,6 @@ private slots:
 
 private:
     void setupOperationsTab();
-    QString mainStyle();
     void normalizeTable(QTableWidget* table);
 
     template <typename T, template <typename> class Container>
@@ -66,4 +65,4 @@ private:
     QTableWidget *tableResult;
 };
 
-#endif
+#endif // MAINWINDOW_H

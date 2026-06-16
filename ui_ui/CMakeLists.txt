@@ -4,7 +4,10 @@ project(ui_ui LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(Qt6 6.5 REQUIRED COMPONENTS Core Widgets)
+find_package(Qt6 6.5 REQUIRED COMPONENTS Core Widgets LinguistTools)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTORCC ON)
 
 qt_standard_project_setup()
 
@@ -13,10 +16,8 @@ qt_add_executable(ui_ui
     main.cpp
     mainwindow.cpp
     mainwindow.h
-    Localization/LocalizationEn.h
-    Localization/LocalizationRu.h
-    Localization/resources.hpp
-    Localization/Style.h
+    mainwindow.ui
+    Localization/resources.qrc
 )
 
 target_include_directories(ui_ui PRIVATE
@@ -29,6 +30,12 @@ target_link_libraries(ui_ui
     PRIVATE
         Qt6::Core
         Qt6::Widgets
+)
+
+qt_add_translations(ui_ui
+    TS_FILES
+        Localization/English.ts
+        Localization/Russia.ts
 )
 
 install(TARGETS ui_ui

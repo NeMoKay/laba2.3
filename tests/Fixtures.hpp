@@ -25,13 +25,13 @@ inline std::string show_matrix(const SparseMatrix<Container, T>& matrix){
 //--------------------
 
 template <typename T1, typename T2>
-testing::AssertionResult CheckRows(const T1& actual, const T2& expected) {
+testing::AssertionResult CheckRows(const T1& actual, const T2& expected){
     if (actual == expected) return testing::AssertionSuccess();
     return testing::AssertionFailure() << "Ошибка в количестве СТРОК -> Ожидалось: " << expected << ", По факту: " << actual;
 }
 
 template <typename T1, typename T2>
-testing::AssertionResult CheckCols(const T1& actual, const T2& expected) {
+testing::AssertionResult CheckCols(const T1& actual, const T2& expected){
     if (actual == expected) return testing::AssertionSuccess();
     return testing::AssertionFailure() << "Ошибка в количестве СТОЛБЦОВ -> Ожидалось: " << expected << ", По факту: " << actual;
 }
@@ -43,19 +43,19 @@ testing::AssertionResult CheckElem(const T1& actual, const T2& expected, int row
 }
 
 template <typename T1, typename T2>
-testing::AssertionResult CheckNorm(const T1& actual, const T2& expected) {
+testing::AssertionResult CheckNorm(const T1& actual, const T2& expected){
     if (actual == expected) return testing::AssertionSuccess();
     return testing::AssertionFailure() << "Ошибка расчета НОРМЫ -> Ожидалось: " << expected << ", По факту: " << actual;
 }
 
 template <typename T1, typename T2>
-testing::AssertionResult CheckReal(const T1& actual, const T2& expected) {
+testing::AssertionResult CheckReal(const T1& actual, const T2& expected){
     if (actual == expected) return testing::AssertionSuccess();
     return testing::AssertionFailure() << "Действительная часть (re) не совпадает -> Ожидалось: " << expected << ", По факту: " << actual;
 }
 
 template <typename T1, typename T2>
-testing::AssertionResult CheckImag(const T1& actual, const T2& expected) {
+testing::AssertionResult CheckImag(const T1& actual, const T2& expected){
     if (actual == expected) return testing::AssertionSuccess();
     return testing::AssertionFailure() << "Мнимая часть (im) не совпадает -> Ожидалось: " << expected << ", По факту: " << actual;
 }

@@ -22,11 +22,44 @@ inline std::string show_matrix(const SparseMatrix<Container, T>& matrix){
     }
     return ss.str();
 }
+//--------------------
 
+template <typename T1, typename T2>
+testing::AssertionResult CheckRows(const T1& actual, const T2& expected) {
+    if (actual == expected) return testing::AssertionSuccess();
+    return testing::AssertionFailure() << "Ошибка в количестве СТРОК -> Ожидалось: " << expected << ", По факту: " << actual;
+}
 
+template <typename T1, typename T2>
+testing::AssertionResult CheckCols(const T1& actual, const T2& expected) {
+    if (actual == expected) return testing::AssertionSuccess();
+    return testing::AssertionFailure() << "Ошибка в количестве СТОЛБЦОВ -> Ожидалось: " << expected << ", По факту: " << actual;
+}
 
+template <typename T1, typename T2>
+testing::AssertionResult CheckElem(const T1& actual, const T2& expected, int row, int col) {
+    if (actual == expected) return testing::AssertionSuccess();
+    return testing::AssertionFailure() << "Ошибка в ЭЛЕМЕНТЕ (" << row << "," << col << ") -> Ожидалось: " << expected << ", По факту: " << actual;
+}
 
+template <typename T1, typename T2>
+testing::AssertionResult CheckNorm(const T1& actual, const T2& expected) {
+    if (actual == expected) return testing::AssertionSuccess();
+    return testing::AssertionFailure() << "Ошибка расчета НОРМЫ -> Ожидалось: " << expected << ", По факту: " << actual;
+}
 
+template <typename T1, typename T2>
+testing::AssertionResult CheckReal(const T1& actual, const T2& expected) {
+    if (actual == expected) return testing::AssertionSuccess();
+    return testing::AssertionFailure() << "Действительная часть (re) не совпадает -> Ожидалось: " << expected << ", По факту: " << actual;
+}
+
+template <typename T1, typename T2>
+testing::AssertionResult CheckImag(const T1& actual, const T2& expected) {
+    if (actual == expected) return testing::AssertionSuccess();
+    return testing::AssertionFailure() << "Мнимая часть (im) не совпадает -> Ожидалось: " << expected << ", По факту: " << actual;
+}
+// ------------------------
 
 class Sparse_Matrix_Fixture : public testing::Test{
 protected:

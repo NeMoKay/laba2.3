@@ -4,27 +4,25 @@
 #include <QLocale>
 #include <QStyleFactory>
 #include <QFile>
-#include <QDebug>
 
 int main(int argc, char *argv[]){
     QApplication a(argc, argv);
-
     a.setStyle(QStyleFactory::create("Fusion"));
 
     QTranslator translator;
-    QString locale = QLocale::system().name();
-    QString path = ":/i18n/" + locale + ".qm";
+    QString locale = QLocale::system().name(); 
+    
+    if (translator.load(":/i18n/" + locale + ".qm")) {
+        a.installTranslator(&translator);
+    } 
 
-    if (translator.load(path)) {
+    else if (translator.load(":/i18n/ru_RU.qm")) {
         a.installTranslator(&translator);
     }
 
     QFile styleFile(":/style.qss");
     if (styleFile.open(QFile::ReadOnly)) {
         a.setStyleSheet(styleFile.readAll());
-    }
-    else{
-        qDebug() << "style.qss не найден";
     }
 
     MainWindow w;

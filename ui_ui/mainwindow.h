@@ -65,4 +65,4 @@ private:
     QTableWidget *tableResult;
 };
 
-#endif // MAINWINDOW_H
+#endif

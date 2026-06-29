@@ -34,8 +34,8 @@ target_link_libraries(ui_ui
 
 qt_add_translations(ui_ui
     TS_FILES
-        Localization/English.ts
-        Localization/Russia.ts
+        Localization/en_US.ts
+        Localization/ru_RU.ts
 )
 
 install(TARGETS ui_ui
